@@ -1,0 +1,10 @@
+#!/bin/bash
+# WF 2018-12-29
+# call a bash inside the docker container
+case $(uname) in
+  Linux) sudo="sudo"
+esac
+prefix=smw3d
+service="$1"
+container="${prefix}_${service}_1"
+$sudo docker exec -it $container bash

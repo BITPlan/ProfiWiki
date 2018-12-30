@@ -1,0 +1,14 @@
+#/bin/bash
+# WF 2018-12-29
+# (re)start profiwiki 
+name=profiwiki
+
+for service in mw db
+do
+  container="${name}_${service}_1"
+  echo "stopping and removing container $container"
+  docker stop $container 
+  docker rm $container
+done 
+docker-compose build
+docker-compose up
