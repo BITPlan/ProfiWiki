@@ -28,7 +28,7 @@ services:
     environment:
       MYSQL_DATABASE: wiki
       MYSQL_USER: wikiuser
-      MYSQL_PASSWORD: "changeme@now"
+      MYSQL_PASSWORD: changeme
       MYSQL_RANDOM_ROOT_PASSWORD: "yes" 
     volumes:
       - mysqldata:/var/lib/mysql
