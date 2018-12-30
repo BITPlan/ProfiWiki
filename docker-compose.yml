@@ -1,0 +1,46 @@
+# see
+# https://www.semantic-mediawiki.org/wiki/Help:Using_Docker
+# https://github.com/SemanticMediaWiki/SemanticMediaWiki/issues/1218
+# https://www.semantic-mediawiki.org/wiki/SMWCon_Fall_2018/Benefits_of_running_MediaWiki_in_a_pertinent_dockerized_setup
+# "Official" Mediawiki image
+# https://hub.docker.com/_/mediawiki/
+# WF 2018-12-29
+version: "3"
+
+# 2 services
+#   db - database
+#   mw - mediawiki
+services:
+
+#  MySQL compatible relational database
+  db:
+# use original image
+    image: mariadb:10.3.10
+    restart: always
+    environment:
+      MYSQL_DATABASE: wiki
+      MYSQL_USER: wikiuser
+      MYSQL_PASSWORD: changeme@now
+      MYSQL_RANDOM_ROOT_PASSWORD: yes
+    volumes:
+      - mysqldata:/var/lib/mysql
+
+# mediawiki 
+  mw:
+    image: mediawiki
+    restart: always
+    ports:
+      - 8080:80
+    links:
+      - db
+    volumes:
+      - wikiimages:/var/www/html/images
+    # After initial setup, download LocalSettings.php to the same directory as
+    # this yaml and uncomment the following line and use compose to restart
+    # the mediawiki service
+    # - ./LocalSettings.php:/var/www/html/LocalSettings.php
+volumes:
+  mysqldata:
+    driver: local
+  wikiimages:
+    driver: local
