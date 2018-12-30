@@ -1,0 +1,26 @@
+# travis configuration for ProfiWiki
+# could be any language since we are using docker
+language: java
+
+sudo: required
+
+services:
+  - docker
+
+dist: bionic
+
+env:
+  COMPOSE_VERSION: 1.23.2
+
+before_install:
+  # Docker Compose Install
+  - curl -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+
+install:
+  - docker-compose build
+
+after_script:
+  - docker-compose stop
+  - docker-compose rm -f
