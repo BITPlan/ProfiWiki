@@ -18,7 +18,7 @@ before_install:
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
   - pwd
-	- ls
+  - ls
 # echo does not work
 #- echo "Travis Build directory: $TRAVIS_BUILD_DIR"
 
