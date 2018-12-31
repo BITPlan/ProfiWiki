@@ -698,7 +698,7 @@ case $install in
   docker)
     color_msg $blue "installing $name using docker on $(hostname) os $(uname)"
     docker_autoinstall
-    name=profiwiki_$MEDIAWIKI_VERSION
+    name=$(echo profiwiki_$MEDIAWIKI_VERSION | sed 's/\./_/g')
     composeyml=$name/docker-compose.yml 
     color_msg $blue "creating $composeyml"
     mkdir -p $name
