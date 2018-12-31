@@ -18,7 +18,8 @@ before_install:
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
   - pwd
-  - echo "Travis Build directory: $TRAVIS_BUILD_DIR"
+# echo does not work
+#- echo "Travis Build directory: $TRAVIS_BUILD_DIR"
 
 install:
   # install three different mediawikis using docker
