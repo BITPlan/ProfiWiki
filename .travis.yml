@@ -19,7 +19,19 @@ before_install:
   - sudo mv docker-compose /usr/local/bin
 
 install:
-  - docker-compose build
+  # install three different mediawikis using docker
+  - ./mw_1_31_1  -p 8081
+  - ./mw_1_30_1  -p 8082
+  - ./mw_1_27_5  -p 8083
+  # install mediawiki 1.31.1 locally
+  - ./mw_1_31_1  -p 8080 -l
+
+script:
+  # testall four mediawikis
+  - testinstall 8081
+  - testinstall 8082
+  - testinstall 8083
+  - testinstall 8084
 
 after_script:
   - docker-compose stop

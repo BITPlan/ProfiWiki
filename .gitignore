@@ -1,3 +1,6 @@
+# generated docker-compose directories 
+profiwiki_*
+
 # Compiled class file
 *.class
 

@@ -1,3 +1,11 @@
+#!/bin/bash
+# WF 2018-12-31
+#
+#
+# dock
+#
+get_docker_compose() {
+cat << EOF
 # 
 #  ProfiWiki based on Semantic Media Wiki based on Mediawiki
 # 
@@ -12,7 +20,7 @@
 # MediaWiki with MariaDB
 #
 # Access via "http://localhost:8080"
-#   (or "http://$(docker-machine ip):8080" if using docker-machine)
+#   (or "http://docker-machine ip:8080" if using docker-machine)
 version: "3"
 
 # 2 services
@@ -28,14 +36,14 @@ services:
     environment:
       MYSQL_DATABASE: wiki
       MYSQL_USER: wikiuser
-      MYSQL_PASSWORD: changeme
+      MYSQL_PASSWORD: $MYSQL_PASSWORD 
       MYSQL_RANDOM_ROOT_PASSWORD: "yes" 
     volumes:
       - mysqldata:/var/lib/mysql
 
 # mediawiki 
   mw:
-    image: mediawiki
+    image: mediawiki:$MEDIAWIKI_VERSION
     restart: always
     ports:
       - 8080:80
@@ -52,3 +60,7 @@ volumes:
     driver: local
   wikiimages:
     driver: local
+EOF
+}
+
+get_docker_compose > $1
