@@ -29,7 +29,7 @@ waitfor() {
   local l_rounds=0
   # wait 20x  longer in travis environment
   case $USER in
-    travis) $l_rounds=$((l_rounds*20))
+    travis) l_rounds=$(($l_rounds*20))
   esac
   while true ; do
     grep "$l_text" -m 1 "$l_file" 
