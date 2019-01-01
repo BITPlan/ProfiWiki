@@ -81,7 +81,8 @@ dotest() {
   # run the install job in the background
   rm nohup.out
   nohup ./$l_wiki&
-  waitfor "apache2 -D FOREGROUND" nohup.out 0.1 50 
+  # 20 secs timeout
+  waitfor "apache2 -D FOREGROUND" nohup.out 0.2 100 
   webcheck "localhost:8080" "LocalSettings.php not found"
 }
 
