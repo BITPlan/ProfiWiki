@@ -29,7 +29,7 @@ install:
 
 script:
   # testinstall 
-  - testinstall
+  - ./testinstall
   #- testinstall 8080
   #- testinstall 8081
   #- testinstall 8082
