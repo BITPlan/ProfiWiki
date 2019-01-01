@@ -1,3 +1,99 @@
 #!/bin/bash
 # WF 2018-12-31
 # test the installation
+
+#
+# display the given error and exit
+# param 
+#   1: l_msg
+#
+error() {
+  local l_msg="$1"
+  echo "$l_msg" 1>&2
+  exit 1
+}
+
+#
+# wait for the given string to appear in the given file
+# params
+#   #1 l_text: the string to wait for
+#   #2 l_file: the file to monitor
+#   #3 l_interval: the interval in seconds to watch
+#   #4 l_limit: how many intervals to wait as a maximum
+#
+waitfor() {
+  local l_text="$1"
+  local l_file="$2"
+  local l_interval="$3"
+  local l_limit="$4"
+  local l_rounds=0
+  while true ; do
+    grep "$l_text" -m 1 "$l_file" 
+    if [ $? -eq 0 ]
+    then
+      break
+    fi 
+    sleep $l_interval
+    l_rounds=$(($l_rounds+1))
+    if [ $l_rounds -ge $l_limit ]
+    then
+      error "$l_text not found in $l_file after trying $l_limit times for $l_interval secs" 
+      break
+    fi 
+  done
+}
+
+#
+# check that the given url contains the given text
+#
+webcheck() {
+  local l_url="$1"
+  local l_text="$2"
+  curl -s "$l_url" | grep "$l_text"
+  if [ $? -ne 0 ]
+  then
+    error "$l_text not found at $l_url" 
+  fi
+}
+
+# get all profiwiki volumes
+profiwiki_volumes() {
+  docker volume ls | grep -v "VOLUME" | grep "profiwiki" | cut -c21-
+}
+
+# cleanup the docker enviroment
+clean() {
+  echo "cleaning docker environment - stopping and removing containers and removing volumes for profiwiki"
+  docker stop $(docker ps -q --filter="name=profiwiki")
+  docker rm $(docker ps -aq --filter="name=profiwiki")
+  for volume in $(profiwiki_volumes) 
+  do
+    docker volume rm $volume
+  done
+}
+
+# test the given installation
+# param #1 start script for wiki installation
+dotest() {
+  clean
+  local l_wiki="$1"
+  echo "testing $l_wiki"
+  # run the install job in the background
+  rm nohup.out
+  nohup ./$l_wiki&
+  waitfor "apache2 -D FOREGROUND" nohup.out 0.1 50 
+  webcheck "localhost:8080" "LocalSettings.php not found"
+}
+
+# test all wikis
+testall() {
+  # loop over the relevant wikis
+  for wiki in mw*
+  do
+    dotest $wiki
+  done
+}
+
+# stop all running containers
+#dotest mw1_31_1
+testall

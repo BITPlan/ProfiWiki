@@ -20,19 +20,20 @@ before_install:
 
 install:
   # install three different mediawikis using docker
-  - ./mw1_31_1  -p 8081&
-  - ./mw1_30_1  -p 8082&
-  - ./mw1_27_5  -p 8083&
+  #- ./mw1_31_1  -p 8081&
+  #- ./mw1_30_1  -p 8082&
+  #- ./mw1_27_5  -p 8083&
   # install mediawiki 1.31.1 locally
   # this also gives the other installations some time to finish in background
-  - ./mw1_31_1  -p 8080 -l
+  #- ./mw1_31_1  -p 8080 -l
 
 script:
-  # testall four mediawikis
-  - testinstall 8080
-  - testinstall 8081
-  - testinstall 8082
-  - testinstall 8083
+  # testinstall 
+  - testinstall
+  #- testinstall 8080
+  #- testinstall 8081
+  #- testinstall 8082
+  #- testinstall 8083
 
 after_script:
   - docker-compose stop
