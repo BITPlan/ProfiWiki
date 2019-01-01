@@ -27,6 +27,10 @@ waitfor() {
   local l_interval="$3"
   local l_limit="$4"
   local l_rounds=0
+  # wait 20x  longer in travis environment
+  case $USER in
+    travis) $l_rounds=$((l_rounds*20))
+  esac
   while true ; do
     grep "$l_text" -m 1 "$l_file" 
     if [ $? -eq 0 ]
@@ -82,8 +86,8 @@ dotest() {
   # run the install job in the background
   rm nohup.out
   nohup ./$l_wiki&
-  # 400 secs timeout
-  waitfor "apache2 -D FOREGROUND" nohup.out 0.2 2000
+  # 6 secs timeout
+  waitfor "apache2 -D FOREGROUND" nohup.out 0.2 30
   webcheck "localhost:8080" "LocalSettings.php not found"
 }
 

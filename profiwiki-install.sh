@@ -698,12 +698,10 @@ case $install in
   docker)
     color_msg $blue "installing $name using docker on $(hostname) os $(uname)"
     docker_autoinstall
-    name=$(echo profiwiki_$MEDIAWIKI_VERSION | sed 's/\./_/g')
-    composeyml=$name/docker-compose.yml 
-    color_msg $blue "creating $composeyml"
-    mkdir -p $name
+    name=$(echo profiwiki_${MEDIAWIKI_VERSION} | sed 's/\./_/g')
+    color_msg $blue "creating $name docker compose"
     export MYSQL_PASSWORD=$(random_password)
-    ./gencompose  $composeyml
+    ./gencompose $name 
     docker_restart $name
     ;;
   local)
