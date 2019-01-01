@@ -37,6 +37,7 @@ waitfor() {
     l_rounds=$(($l_rounds+1))
     if [ $l_rounds -ge $l_limit ]
     then
+      cat $l_file
       error "$l_text not found in $l_file after trying $l_limit times for $l_interval secs" 
       break
     fi 
@@ -81,8 +82,8 @@ dotest() {
   # run the install job in the background
   rm nohup.out
   nohup ./$l_wiki&
-  # 20 secs timeout
-  waitfor "apache2 -D FOREGROUND" nohup.out 0.2 100 
+  # 400 secs timeout
+  waitfor "apache2 -D FOREGROUND" nohup.out 0.2 2000
   webcheck "localhost:8080" "LocalSettings.php not found"
 }
 
