@@ -22,4 +22,4 @@ Will get your Semantic MediaWiki running in a few minutes.
 * Docker composer based
 * based on official Mediawiki docker image
 ### History
-* 0.0.1 2019-01-02  
+* 0.0.1 2019-01-02 implements #1
