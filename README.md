@@ -7,5 +7,19 @@ Professional SemanticMediaWiki
 [![GitHub](https://img.shields.io/github/license/BITPlan/ProfiWiki.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![BITPlan](http://wiki.bitplan.com/images/wiki/thumb/3/38/BITPlanLogoFontLessTransparent.png/198px-BITPlanLogoFontLessTransparent.png)](http://www.bitplan.com)
 
+![Mediawiki](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/MediaWiki_logo_1.png/128px-MediaWiki_logo_1.png)
+![SemanticMediaWiki](http://semantic-mediawiki.org/w/images/7/7c/SMW_logo_142px.png)
+
+Semantic MediaWiki with fully automated install. 
+Will get your Semantic MediaWiki running in a few minutes.
+
+* See http://www.semantic-mediawiki.org/
+* See  https://www.mediawiki.org/wiki/MediaWiki
+* see https://github.com/SemanticMediaWiki/SemanticMediaWiki/issues/1218
 ### Documentation
 * [Wiki](http://www.bitplan.com/ProfiWiki)
+### Features
+* Docker composer based
+* based on official Mediawiki docker image
+### History
+* 0.0.1 2019-01-02  
