@@ -62,6 +62,7 @@ usage() {
   echo "$0"
   echo ""
   echo "options: "
+  echo "       -c|--clean            : clean - clean up docker containers and volumes (juse with caution)"
   # -h|--help|usage|show this usage
   echo "       -h|--help             : show this usage"
   echo "    -nols|--no_local_settings: skip automatic creation of LocalSettings.php"
@@ -69,6 +70,7 @@ usage() {
   echo "       -l|--local            : local install (default is docker)"
   echo "       -n|--needed           : check and install needed prequisites"
   echo "       -m|--mysql            : initialize and start mysql" 
+  echo "       -r|--random           : create random passwords"
   echo "     -smw|--smw              : install Semantic MediaWiki"
   exit 1 
 }
@@ -118,8 +120,7 @@ prepare_mysql() {
   then
     service mysql start
     #/mysqlstart.sh
-    MYSQL_PASSWD=`random_password`
-    color_msg $blue "setting MySQL password to random password $MYSQL_PASSWD"
+    color_msg $blue "setting MySQL password ..."
     mysqladmin -u root password $MYSQL_PASSWD
   else
     color_msg $blue "MySQL preparation skipped"
@@ -439,8 +440,6 @@ mediawiki_install() {
       # get the database environment variables
       getdbenv $localsettings_dist
     
-      # create a random SYSOP passsword
-      SYSOP_PASSWD=`random_password`
      
       # run the Mediawiki install script
       php $mwpath/maintenance/install.php \
@@ -627,6 +626,122 @@ EOF
   echo "$SYSOP_PASSWD" > $HOME/.sysop.passwd
 fi
 }
+#
+# check the match of two entered passwords
+#  params
+#    #1 l_title: the title of the password
+#    #2 l_1: the first password
+#    #3 l_2: the second password
+#
+check_match() {
+  local l_title="$1"
+  local l_1="$2"
+  local l_2="$3"
+  if [ "$l_1" != "$l_2" ]
+  then
+    echo "$l_title"
+  else
+    if [ "$l_1" = "" ]
+    then
+      echo "$l_title"
+    fi
+  fi
+}
+#
+# show the given password dialog
+#
+password_dialog() {
+  backtitle="$1"
+  formtitle="$2"
+  DIALOG=dialog
+
+  DIALOG_OK=0
+  DIALOG_CANCEL=1
+  DIALOG_ESC=255
+
+  returncode=0
+  while test $returncode != $DIALOG_CANCEL && test $returncode != 250
+  do
+    exec 3>&1
+    pwdata=$($DIALOG  \
+	  --backtitle "$backtitle" \
+	  --insecure  \
+	  --passwordform "$formtitle" \
+15 60 0 \
+	"               MySQL root:"  1 2 "${pwarray[0]}" 1 29 16 0 \
+	"     MySQL root (confirm):"  2 2 "${pwarray[1]}" 2 29 16 0 \
+	"           MySQL wikuser):"  4 2 "${pwarray[2]}" 4 29 16 0 \
+	"  MySQL wikuser (confirm):"  5 2 "${pwarray[3]}" 5 29 16 0 \
+	"          mediawiki Sysop:"  7 2 "${pwarray[4]}" 7 29 16 0 \
+	"mediawiki Sysop (confirm):"  8 2 "${pwarray[5]}" 8 29 16 0 \
+	2>&1 1>&3)
+  returncode=$?
+  exec 3>&-
+
+  case $returncode in
+    $DIALOG_ESC|$DIALOG_CANCEL)
+      "$DIALOG" \
+	--clear \
+	--backtitle "$backtitle" \
+	--yesno "Really about ProfiWiki installation?" 6 30
+	case $? in
+  	  $DIALOG_OK)
+            clear
+	    error "Installation aborted - rerun e.g. with --random option to automatically set passwords"
+	    break
+	  ;;
+	  $DIALOG_CANCEL)
+	    returncode=99
+	  ;;
+	esac
+	;;
+	$DIALOG_OK)
+	  #echo $pwdata 
+	  pwarray=($(echo "$pwdata"))
+	  msg1=$(check_match "MySQL root "      ${pwarray[0]} ${pwarray[1]})
+	  msg2=$(check_match "MySQL wikiuser "  ${pwarray[2]} ${pwarray[3]})
+	  msg3=$(check_match "mediawiki Sysop " ${pwarray[4]} ${pwarray[5]})
+	  msg="$msg1$msg2$msg3"
+	  if [ "$msg" = "" ]
+          then
+            export MYSQL_PASSWORD="${pwarray[0]}"
+            export SYSOP_PASSWD="${pwarray[4]}"
+	    break;
+	  else
+	    formtitle="$msg1$msg2${msg3}passwords do not match or empty - please reenter"
+	  fi 
+	  ;;
+	*)
+	  echo "unknown dialog return code $returncode"
+	  ;;
+	esac
+  done
+}
+
+#
+# get the passwords
+# 
+get_passwords() {
+  if [ "$random_passwords" = "true" ]
+  then
+    # create a random SYSOP passsword
+    export SYSOP_PASSWD=$(random_password)
+    export MYSQL_PASSWORD=$(random_password)
+  else
+    password_dialog "ProfiWiki Setup" "Please specify passwords"
+  fi
+}
+
+# cleanup the docker enviroment
+clean() {
+  echo "cleaning docker environment - stopping and removing containers and removing volumes for profiwiki"
+  docker stop $(docker ps -q --filter="name=profiwiki")
+  docker rm $(docker ps -aq --filter="name=profiwiki")
+  for volume in $(profiwiki_volumes) 
+  do
+    docker volume rm $volume
+  done
+}
 
 #
 # start of script
@@ -651,9 +766,13 @@ then
   export MEDIAWIKI_PORT="8080"
 fi
 
+
 while test $# -gt 0
 do
   case $1 in
+    -c|--clean) 
+      clean;;
+
     # -h|--help|usage|show this usage
     -h|--help) 
       usage;;
@@ -675,6 +794,10 @@ do
 
     -nols|--no_local_settings) 
       option="-nols";;
+
+    -r|--random) 
+      random_passwords="true"
+      ;;
 
     -p|--port) 
       shift
@@ -700,7 +823,7 @@ case $install in
     docker_autoinstall
     name=$(echo profiwiki_${MEDIAWIKI_VERSION} | sed 's/\./_/g')
     color_msg $blue "creating $name docker compose"
-    export MYSQL_PASSWORD=$(random_password)
+    get_passwords
     ./gencompose $name 
     docker_restart $name
     ;;

@@ -2,6 +2,54 @@
 # WF 2018-12-29
 # call a bash inside the docker container
 prefix=profiwiki
-service="$1"
-container="${prefix}_${service}_1"
-$sudo docker exec -it $container bash
+
+#
+# a colored message 
+#   params:
+#     1: l_color - the color of the message
+#     2: l_msg - the message to display
+#
+color_msg() {
+  local l_color="$1"
+  local l_msg="$2"
+  echo -e "${l_color}$l_msg${endColor}"
+}
+
+#
+# error
+#
+#   show an error message and exit
+#
+#   params:
+#     1: l_msg - the message to display
+error() {
+  local l_msg="$1"
+  # use ansi red for error
+  color_msg $red "Error: $l_msg" 1>&2
+  exit 1
+}
+
+#
+# show usage
+#
+usage() {
+  echo "$0 [27|30|31] [db|mw]"
+  echo "e.g $0 27 db will call a bash in the mediawiki 1.27.5 mariadb container"
+  exit 1
+}
+
+if [ $# -lt 2 ]
+then
+  usage
+fi
+
+version="$1"
+service="$2"
+case $version in
+  27) version="127";;
+  30) version="130";;
+  31) version="131";;
+  *) usage;;
+ esac
+container="${prefix}${version}_${service}_1"
+docker exec -it $container bash
