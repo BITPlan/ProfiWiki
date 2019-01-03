@@ -122,6 +122,8 @@ dotest() {
   # no LocalSettings should be available at this time
   local l_mwsite="localhost:8080"
   webcheck $l_mwsite "LocalSettings.php not found"
+  # check running containers 
+  docker ps
   # copy the phpinfo.php to the mediawiki docker container
   docker cp image/phpinfo.php ${l_mw_container}:/var/www/html
   # check the result - e.g. the PHP version should show
