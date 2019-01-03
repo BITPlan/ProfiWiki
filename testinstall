@@ -140,5 +140,5 @@ testall() {
 # stop all running containers
 #dotest mw1_31_1
 echo "Testing for user $USER"
-#testall
-dotest mw1_31_1
+testall
+#dotest mw1_31_1
