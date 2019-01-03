@@ -389,7 +389,7 @@ mediawiki_install() {
     mwpath=$apachepath/$MEDIAWIKI
     if [ ! -L $apachepath/mediawiki ]
     then
-      sudo ln -s $mwpath $apachepath/mediawiki
+      $sudo ln -s $mwpath $apachepath/mediawiki
     fi
   fi
  
@@ -509,8 +509,13 @@ autoinstall() {
       which $l_prog 
       if [ $? -eq 1 ]
       then
-        color_msg $blue "installing $l_prog from MacPorts package $l_macospackage"        
-        sudo port install $l_macospackage
+	if [ $l_macospackage="-" ]
+	then
+          color_msg $red "no MacPorts package specified for $l_prog - please install yourself manually"        
+	else
+          color_msg $blue "installing $l_prog from MacPorts package $l_macospackage"        
+          sudo port install $l_macospackage
+        fi
       else
         color_msg $green "macports package $l_macospackage already installed"         
       fi
@@ -521,7 +526,7 @@ autoinstall() {
       if [ $? -eq 1 ]
       then
         color_msg $blue "installing $l_prog from apt-package $l_linuxpackage"        
-        sudo apt-get -y install $l_linuxpackage
+        $sudo apt-get -y install $l_linuxpackage
       else
         color_msg $green "apt-package $l_linuxpackage already installed"         
       fi
@@ -538,14 +543,27 @@ autoinstall() {
 # some of the software might have already been installed by the Dockerfile
 #
 check_needed() {
-  php="php7.2"
+  # software we'd always like to see installed
   autoinstall curl curl curl
   autoinstall dialog dialog dialog
   autoinstall dot graphviz graphviz
   autoinstall convert imagemagick imagemagick
-  autoinstall apache2ctl apache2 apache2
-  autoinstall mysql mysql-server mysql-server
-  autoinstall php $php $php 
+  # for plantuml and profiwiki
+  # autoinstall java openjdk-8-jdk -
+  # software for local install
+  case $install in
+    local)
+      phpversion="72"
+      autoinstall mysql mysql-server mysql-server
+      autoinstall php $php $php 
+      autoinstall apache2ctl apache2 apache2
+    ;;
+    docker)
+      phpversion=$(php --version | head -1 | cut -c 5-7 | sed 's/\.//')
+      ;;
+  esac
+  color_msg $green "PHP Version is $phpversion"
+  php=php${phpversion}
   phpexts=/tmp/phpexts$$
   php -r "print_r(get_loaded_extensions());" > $phpexts
   for module in iconv curl gd mysql openssl mbstring xml
@@ -553,7 +571,9 @@ check_needed() {
     grep "=> $module" $phpexts > /dev/null
     if [ $? -ne 0 ]
     then
-      autoinstall php-$module $php-$module 
+      autoinstall php-$module $php-$module $php-$module
+    else
+      color_msg $green "php module $module already installed"
     fi
   done
 }
@@ -567,6 +587,7 @@ docker_autoinstall() {
   sudo usermod -aG docker $(id -un) 
   autoinstall docker-compose docker-compose docker-compose
 }
+
 #
 # (re)start the docker containers
 # 
@@ -825,10 +846,15 @@ case $install in
     color_msg $blue "creating $name docker compose"
     get_passwords
     ./gencompose $name 
+    # make sure this script is in the context of the docker-compose environment
+    l_script=$(basename $0)
+    # redundant copy ... 
+    cp -p $l_script $name/$l_script
     docker_restart $name
     ;;
   local)
     color_msg $blue "installing $name locally on $(hostname) os $(uname)"
+    sudo="sudo"
     install_locally
     ;;
 esac

@@ -115,6 +115,9 @@ dotest() {
   # check that the Apache 2 Webserver is up
   # 30 times 0.2 secs = 6 secs timeout
   waitfor "apache2 -D FOREGROUND" nohup.out 0.2 30
+  # check that the MariaDB is up
+  # 50 times 0.2 secs = 10 secs timeout
+  waitfor "port: 3306" nohup.out 0.2 50 
   # check the current state of the website
   # no LocalSettings should be available at this time
   local l_mwsite="localhost:8080"
@@ -137,5 +140,5 @@ testall() {
 # stop all running containers
 #dotest mw1_31_1
 echo "Testing for user $USER"
-testall
-#dotest mw1_31_1
+#testall
+dotest mw1_31_1
