@@ -81,22 +81,34 @@ clean() {
 }
 
 #
-# get the container name for the given wiki name
+# get the container name for the given wiki and service name
 # params
 #   #1: l_wiki - the wiki name e.g. mw1_27_5
+#   #2: l_service the service name e.g. db
 # returns
 #   the container name e.g. profiwiki127
 #
 container_name() {
   local l_wiki="$1"
+  local l_service="$2"
   local l_prefix="profiwiki"
   local l_version=""
-  case $l_wiki in
-    mw1_27_5) l_version=127;;
-    mw1_30_1) l_version=130;;
-    mw1_31_1) l_version=131;;
-  esac 
-  echo ${l_prefix}${l_version}
+  case $USER in
+    travis)
+    case $l_wiki in
+      mw1_27_5) l_version=_1_27;;
+      mw1_30_1) l_version=_1_30;;
+      mw1_31_1) l_version=_1_31;;
+    esac 
+    ;;
+    case $l_wiki in
+      mw1_27_5) l_version=127;;
+      mw1_30_1) l_version=130;;
+      mw1_31_1) l_version=131;;
+    esac 
+    ;;
+  esac
+  echo ${l_prefix}${l_version}_${l_service}_1
 }
 
 # test the given installation
