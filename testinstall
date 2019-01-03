@@ -117,9 +117,7 @@ container_name() {
 dotest() {
   clean
   local l_wiki="$1"
-  local l_container=$(container_name $l_wiki)
-  # media wiki container tag
-  local l_mw_container=${l_container}_mw_1
+  local l_mw_container=$(container_name $l_wiki mw)
   echo "testing $l_wiki"
   # run the install job in the background
   rm nohup.out
