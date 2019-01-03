@@ -32,10 +32,10 @@ waitfor() {
     travis) l_limit=$(($l_limit*20))
   esac
   while true ; do
-    grep "$l_text" -m 1 "$l_file"
+    l_found=$(grep "$l_text" -m 1 "$l_file")
     if [ $? -eq 0 ]
     then
-      echo "✅$l_text"
+      echo "✅ $l_text → $l_found"
       break
     fi 
     sleep $l_interval
@@ -43,7 +43,7 @@ waitfor() {
     if [ $l_rounds -ge $l_limit ]
     then
       cat $l_file
-      error "❌$l_text not found in $l_file after trying $l_limit times for $l_interval secs" 
+      error "❌ $l_text not found in $l_file after trying $l_limit times for $l_interval secs" 
       break
     fi 
   done
@@ -55,12 +55,12 @@ waitfor() {
 webcheck() {
   local l_url="$1"
   local l_text="$2"
-  local l_found=$(curl -s "$l_url" | grep "$l_text")
+  l_found=$(curl -s "$l_url" | grep "$l_text")
   if [ $? -ne 0 ]
   then
-    error "❌$l_text not found at $l_url" 
+    error "❌ $l_text not found at $l_url" 
   else
-    echo "✅$l_url:$l_found"
+    echo "✅ $l_url • $l_text → $l_found"
   fi
 }
 
@@ -122,7 +122,7 @@ dotest() {
   # copy the phpinfo.php to the mediawiki docker container
   docker cp image/phpinfo.php ${l_mw_container}:/var/www/html
   # check the result - e.g. the PHP version should show
-  webcheck $l_mwsite/phpinfo.php "PHP/7.0.33"
+  webcheck $l_mwsite/phpinfo.php "PHP/7"
 }
 
 # test all wikis
@@ -138,4 +138,4 @@ testall() {
 #dotest mw1_31_1
 echo "Testing for user $USER"
 testall
-#dotest mw1_27_5
+#dotest mw1_31_1
