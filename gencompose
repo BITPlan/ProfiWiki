@@ -76,6 +76,11 @@ cat << EOF
 # at $timestamp by $USER on $(hostname)
 #
 FROM mediawiki:$MEDIAWIKI_VERSION
+# responsible for this image setup
+# see also http://www.bitplan.com/index.php/ProfiWiki 
+MAINTAINER Wolfgang Fahl <wf@bitplan.com>
+# install some more utilities
+RUN apt-get update && apt-get install -y vim unzip zip 
 EOF
 }
 

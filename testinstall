@@ -32,9 +32,10 @@ waitfor() {
     travis) l_limit=$(($l_limit*20))
   esac
   while true ; do
-    grep "$l_text" -m 1 "$l_file" 
+    grep "$l_text" -m 1 "$l_file"
     if [ $? -eq 0 ]
     then
+      echo "✅$l_text"
       break
     fi 
     sleep $l_interval
@@ -42,7 +43,7 @@ waitfor() {
     if [ $l_rounds -ge $l_limit ]
     then
       cat $l_file
-      error "$l_text not found in $l_file after trying $l_limit times for $l_interval secs" 
+      error "❌$l_text not found in $l_file after trying $l_limit times for $l_interval secs" 
       break
     fi 
   done
@@ -54,10 +55,12 @@ waitfor() {
 webcheck() {
   local l_url="$1"
   local l_text="$2"
-  curl -s "$l_url" | grep "$l_text"
+  local l_found=$(curl -s "$l_url" | grep "$l_text")
   if [ $? -ne 0 ]
   then
-    error "$l_text not found at $l_url" 
+    error "❌$l_text not found at $l_url" 
+  else
+    echo "✅$l_url:$l_found"
   fi
 }
 
@@ -77,19 +80,49 @@ clean() {
   done
 }
 
+#
+# get the container name for the given wiki name
+# params
+#   #1: l_wiki - the wiki name e.g. mw1_27_5
+# returns
+#   the container name e.g. profiwiki127
+#
+container_name() {
+  local l_wiki="$1"
+  local l_prefix="profiwiki"
+  local l_version=""
+  case $l_wiki in
+    mw1_27_5) l_version=127;;
+    mw1_30_1) l_version=130;;
+    mw1_31_1) l_version=131;;
+  esac 
+  echo ${l_prefix}${l_version}
+}
+
 # test the given installation
 # param #1 start script for wiki installation
 dotest() {
   clean
   local l_wiki="$1"
+  local l_container=$(container_name $l_wiki)
+  # media wiki container tag
+  local l_mw_container=${l_container}_mw_1
   echo "testing $l_wiki"
   # run the install job in the background
   rm nohup.out
   # test with random password
   nohup ./$l_wiki -r&
-  # 6 secs timeout
+  # check that the Apache 2 Webserver is up
+  # 30 times 0.2 secs = 6 secs timeout
   waitfor "apache2 -D FOREGROUND" nohup.out 0.2 30
-  webcheck "localhost:8080" "LocalSettings.php not found"
+  # check the current state of the website
+  # no LocalSettings should be available at this time
+  local l_mwsite="localhost:8080"
+  webcheck $l_mwsite "LocalSettings.php not found"
+  # copy the phpinfo.php to the mediawiki docker container
+  docker cp image/phpinfo.php ${l_mw_container}:/var/www/html
+  # check the result - e.g. the PHP version should show
+  webcheck $l_mwsite/phpinfo.php "PHP/7.0.33"
 }
 
 # test all wikis
@@ -105,3 +138,4 @@ testall() {
 #dotest mw1_31_1
 echo "Testing for user $USER"
 testall
+#dotest mw1_27_5
