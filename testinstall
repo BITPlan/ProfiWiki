@@ -101,6 +101,7 @@ container_name() {
       mw1_31_1) l_version=_1_31;;
     esac 
     ;;
+    *)
     case $l_wiki in
       mw1_27_5) l_version=127;;
       mw1_30_1) l_version=130;;
