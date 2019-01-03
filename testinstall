@@ -112,6 +112,24 @@ container_name() {
   echo ${l_prefix}${l_version}_${l_service}_1
 }
 
+#
+# list the needed parts to be checked
+#
+needed() {
+cat << EOF
+package curl
+package dialog
+package graphviz
+module iconv
+module curl
+module gd
+module mysql
+module openssl
+module mbstring
+module xml
+EOF
+}
+
 # test the given installation
 # param #1 start script for wiki installation
 dotest() {
@@ -139,6 +157,17 @@ dotest() {
   docker cp image/phpinfo.php ${l_mw_container}:/var/www/html
   # check the result - e.g. the PHP version should show
   webcheck $l_mwsite/phpinfo.php "PHP/7"
+  # run the install needed check
+  neededlog=/tmp/needed$$
+  docker exec -it ${l_mw_container} /root/profiwiki-install.sh -n > $neededlog
+  IFS=$'\n'       # make newlines the only separator
+  for need in $(needed)
+  do
+    # check the log (just once)
+    waitfor "$need already installed" $neededlog 0.1 1
+  done
+  unset IFS
+  rm $neededlog
 }
 
 # test all wikis
