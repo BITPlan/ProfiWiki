@@ -50,6 +50,32 @@ waitfor() {
 }
 
 #
+# execute the given command and wait for the result
+#
+# params
+#   #1 l_cmd: the command to execute 
+#   #2 l_expected: the results to wait for (subshell to call to get the results limited by newline)
+#   #3 l_interval: the interval in seconds to watch
+#   #4 l_limit: how many intervals to wait as a maximum
+#
+waitfor_cmd() {
+  local l_cmd="$1"
+  local l_expected="$2"
+  local l_interval="$3"
+  local l_limit="$4"
+  local l_waitforcmdlog=/tmp/waitforcmd$$
+  $l_cmd > $l_waitforcmdlog
+  IFS=$'\n'       # make newlines the only separator
+  for l_expect in $($l_expected)
+  do
+    # check the log (just once)
+    waitfor "$l_expect" $l_waitforcmdlog $l_interval $l_limit 
+  done
+  unset IFS
+  rm $l_waitforcmdlog
+}
+
+#
 # check that the given url contains the given text
 #
 webcheck() {
@@ -117,16 +143,16 @@ container_name() {
 #
 needed() {
 cat << EOF
-package curl
-package dialog
-package graphviz
-module iconv
-module curl
-module gd
-module mysql
-module openssl
-module mbstring
-module xml
+package curl already installed
+package dialog already installed
+package graphviz already installed
+module iconv already installed
+module curl already installed
+module gd already installed
+module mysql already installed
+module openssl already installed
+module mbstring already installed
+module xml already installed
 EOF
 }
 
@@ -158,16 +184,7 @@ dotest() {
   # check the result - e.g. the PHP version should show
   webcheck $l_mwsite/phpinfo.php "PHP/7"
   # run the install needed check
-  neededlog=/tmp/needed$$
-  docker exec -it ${l_mw_container} /root/profiwiki-install.sh -n > $neededlog
-  IFS=$'\n'       # make newlines the only separator
-  for need in $(needed)
-  do
-    # check the log (just once)
-    waitfor "$need already installed" $neededlog 0.1 1
-  done
-  unset IFS
-  rm $neededlog
+  waitfor_cmd "docker exec -it ${l_mw_container} /root/profiwiki-install.sh -n" needed 0.1 1
 }
 
 # test all wikis
