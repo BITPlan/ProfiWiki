@@ -81,13 +81,14 @@ FROM mediawiki:$MEDIAWIKI_VERSION
 MAINTAINER Wolfgang Fahl <wf@bitplan.com>
 # install some more utilities
 RUN apt-get update && apt-get install -y \
+  dialog \
+  imagemagick \
+  graphviz \
   libjpeg62-turbo-dev \
   libfreetype6-dev \
   libpng-dev \
   libzip-dev \
-  dialog \
-  graphviz \
-  imagemagick \
+  mariadb-client-core-10.1 \
   vim \
   unzip \
   zip && \
