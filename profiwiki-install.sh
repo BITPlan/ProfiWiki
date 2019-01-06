@@ -904,7 +904,7 @@ case $install in
     color_msg $blue "installing $name using docker on $(hostname) os $(uname)"
     name=$(echo profiwiki_${MEDIAWIKI_VERSION} | sed 's/\./_/g')
     color_msg $blue "creating $name docker compose"
-    if [ ! -d $ name ]
+    if [ ! -d $name ]
     then
       mkdir $name
     fi
