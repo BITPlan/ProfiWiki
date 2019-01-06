@@ -50,7 +50,7 @@ services:
     build: .
     restart: always
     ports:
-      - 8080:80
+      - $MEDIAWIKI_PORT:80
     links:
       - db
     volumes:
@@ -119,6 +119,7 @@ COPY profiwiki-install.sh /root
 EOF
 }
 
+# name of the directory
 target="$1"
 mkdir -p $target
 get_docker_compose > $target/docker-compose.yml

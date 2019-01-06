@@ -13,4 +13,4 @@ wikiuser=Sysop
 # Language of the wiki 
 wikilang=en
 # the port to use
-export MEDIAWIKI_PORT=8080
+export MEDIAWIKI_PORT=8180

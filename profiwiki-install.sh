@@ -902,14 +902,15 @@ case $install in
   docker)
     docker_autoinstall
     color_msg $blue "installing $name using docker on $(hostname) os $(uname)"
-    name=$(echo profiwiki_${MEDIAWIKI_VERSION} | sed 's/\./_/g')
+    name=$(echo profiwiki${MEDIAWIKI_VERSION} | sed 's/\.//g')
     color_msg $blue "creating $name docker compose"
     if [ ! -d $name ]
     then
       mkdir $name
     fi
     get_passwords $name/wiki-pwconfig.sh
-
+		# get the configuration values
+    getdbenv
     ./gencompose $name
     # make sure this script is in the context of the docker-compose environment
     l_script=$(basename $0)

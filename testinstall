@@ -206,9 +206,9 @@ container_name() {
   local l_version=""
 
   case $l_wiki in
-    mw1_27_5) l_version=_1_27;;
-    mw1_30_1) l_version=_1_30;;
-    mw1_31_1) l_version=_1_31;;
+    mw1_27_5) l_version=127;;
+    mw1_30_1) l_version=130;;
+    mw1_31_1) l_version=131;;
   esac
 
   echo ${l_prefix}${l_version}_${l_service}_1
@@ -235,16 +235,25 @@ EOF
 #
 # check that the ports are not in use
 #
-# params
-#  #1: l_ports: the list of ports to be checked
+# params: the list of ports to be checked
 check_ports() {
-  local l_ports="$1"
-  for port in $l_ports
+  for port in $@
   do
-    netstat -nlpt |grep $port 
+	  color_msg $blue "checking that port $port is not in use" 
+	  # even netstat is incompatible on MacOS
+	  # https://stackoverflow.com/a/4421674/1497139
+	  os=`uname`
+    case $os in
+      Darwin*)
+			 sudo lsof -nP -i4TCP:$port | grep LISTEN
+			;;
+			*)
+       netstat -nlpt |grep $port 
+			;;
+		esac
     if [ $? -eq 0 ]
     then
-      error "$port is in use"
+      error "$port is in use - you might want to stop the process that use it or reconfigure"
     fi
   done
 }
@@ -252,7 +261,8 @@ check_ports() {
 # param #1 start script for wiki installation
 dotest() {
   clean
-  check_ports 3306 80
+	mwport=$(grep MEDIAWIKI_PORT wiki-config.sh | cut -f2 -d"=")
+  check_ports 3306 $mwport
   local l_wiki="$1"
   local l_mw_container=$(container_name $l_wiki mw)
   color_msg $blue "testing $l_wiki"
@@ -285,7 +295,7 @@ dotest() {
   timestamp
   # check the current state of the website
   # no LocalSettings should be available at this time
-  local l_mwsite="localhost:8080"
+  local l_mwsite="localhost:$mwport"
   webcheck $l_mwsite "LocalSettings.php not found"
   # check running containers
   docker ps
