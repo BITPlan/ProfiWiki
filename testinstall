@@ -247,7 +247,7 @@ dotest() {
   # make sure the process has opened the log file
   sleep 0.2
   # show the progress
-  #tail -f nohup.out
+  tail -f nohup.out&
   tail_pid=$!
   timestamp
   color_msg $blue "started install with pid $install_pid log is shown with pid $tail_pid"
@@ -276,6 +276,8 @@ dotest() {
   webcheck $l_mwsite/phpinfo.php "PHP/7"
   # run the install needed check
   waitfor_cmd "docker exec -it ${l_mw_container} /root/profiwiki-install.sh -n" needed 0.1 1
+  # end the log output
+  kill -9 $tail_pid
 }
 
 # test all wikis
