@@ -232,10 +232,27 @@ module xml already installed
 EOF
 }
 
+#
+# check that the ports are not in use
+#
+# params
+#  #1: l_ports: the list of ports to be checked
+check_ports() {
+  local l_ports="$1"
+  for port in $l_ports
+  do
+    netstat -nlpt |grep $port 
+    if [ $? -eq 0 ]
+    then
+      error "$port is in use"
+    fi
+  done
+}
 # test the given installation
 # param #1 start script for wiki installation
 dotest() {
   clean
+  check_ports 3306 80
   local l_wiki="$1"
   local l_mw_container=$(container_name $l_wiki mw)
   color_msg $blue "testing $l_wiki"
