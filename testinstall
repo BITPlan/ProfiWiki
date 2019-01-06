@@ -256,6 +256,8 @@ dotest() {
   # if docker has not cached the results yet wait
   waitif "Reading package lists..." "Waiting until docker build is finished" "Step 6/" "Docker build cached" nohup.out 0.2 25 1000
   timestamp
+  # wait for e.g. chown to finish
+  waitfor "Step 7/" nohup.out 0.2 1000
   # check that the Apache 2 Webserver is up
   # 30 times 0.2 secs = 6 secs timeout
   waitfor "apache2 -D FOREGROUND" nohup.out 0.2 30
