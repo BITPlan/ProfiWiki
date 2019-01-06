@@ -108,6 +108,12 @@ RUN apt-get update && apt-get install -y \
 # change ownership of files
 RUN chown -R www-data.www-data /var/www/html
 
+# COPY the wiki-config script holding the configuration parameters
+COPY wiki-config.sh /root
+
+# COPY the wiki-pwconfig script holding the password parameters
+COPY wiki-pwconfig.sh /root
+
 # COPY the install script
 COPY profiwiki-install.sh /root
 EOF
