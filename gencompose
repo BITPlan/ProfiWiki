@@ -36,7 +36,7 @@ services:
     environment:
       MYSQL_DATABASE: wiki
       MYSQL_USER: wikiuser
-      MYSQL_PASSWORD: $MYSQL_PASSWORD
+      MYSQL_PASSWORD: "$MYSQL_PASSWORD"
       MYSQL_RANDOM_ROOT_PASSWORD: "yes"
     ports:
       - 3306:3306
