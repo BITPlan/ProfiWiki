@@ -2,15 +2,79 @@
 # WF 2018-12-31
 # test the installation
 
+#ansi colors
+#http://www.csc.uvic.ca/~sae/seng265/fall04/tips/s265s047-tips/bash-using-colors.html
+blue='\x1B[0;34m'
+red='\x1B[0;31m'
+green='\x1B[0;32m' # '\e[1;32m' is too bright for white bg.
+endColor='\x1B[0m'
+
 #
-# display the given error and exit
-# param 
-#   1: l_msg
+# a colored message
+#   params:
+#     1: l_color - the color of the message
+#     2: l_msg - the message to display
 #
+color_msg() {
+  local l_color="$1"
+  local l_msg="$2"
+  echo -e "${l_color}$l_msg${endColor}"
+}
+
+#
+# error
+#
+#   show an error message and exit
+#
+#   params:
+#     1: l_msg - the message to display
 error() {
   local l_msg="$1"
-  echo "$l_msg" 1>&2
+  # use ansi red for error
+  color_msg $red "Error: $l_msg" 1>&2
   exit 1
+}
+
+#
+# get a time stamp
+#
+timestamp() {
+  date "+%Y-%m-%d %H:%M:%S"
+}
+
+#
+# wait for the given string to appear in the given file
+# params
+#   #1 l_text: the string to wait for
+#   #2 l_file: the file to monitor
+#   #3 l_interval: the interval in seconds to watch
+#   #4 l_limit: how many intervals to wait as a maximum
+#
+dowaitfor() {
+  local l_text="$1"
+  local l_file="$2"
+  local l_interval="$3"
+  local l_limit="$4"
+  local l_rounds=0
+  # wait 20x  longer in travis environment
+  case $USER in
+    travis) l_limit=$(($l_limit*20))
+  esac
+  while true ; do
+    l_dowaitfor_found=$(grep "$l_text" -m 1 "$l_file")
+    if [ $? -eq 0 ]
+    then
+      echo "$l_dowaitfor_found"
+      break
+    fi
+    sleep $l_interval
+    l_rounds=$(($l_rounds+1))
+    if [ $l_rounds -ge $l_limit ]
+    then
+      echo "timeout"
+      break
+    fi
+  done
 }
 
 #
@@ -26,34 +90,55 @@ waitfor() {
   local l_file="$2"
   local l_interval="$3"
   local l_limit="$4"
-  local l_rounds=0
-  # wait 20x  longer in travis environment
-  case $USER in
-    travis) l_limit=$(($l_limit*20))
-  esac
-  while true ; do
-    l_found=$(grep "$l_text" -m 1 "$l_file")
-    if [ $? -eq 0 ]
-    then
-      echo "✅ $l_text → $l_found"
-      break
-    fi 
-    sleep $l_interval
-    l_rounds=$(($l_rounds+1))
-    if [ $l_rounds -ge $l_limit ]
-    then
-      cat $l_file
-      error "❌ $l_text not found in $l_file after trying $l_limit times for $l_interval secs" 
-      break
-    fi 
-  done
+  l_waitfor_found=$(dowaitfor  "$l_text" "$l_file" "$l_interval" "$l_limit")
+  if [ "$l_waitfor_found" = "timeout" ]
+  then
+    error "❌ $l_text not found in $l_file after trying $l_limit times for $l_interval secs"
+  else
+    color_msg $green "✅ $l_text → $l_waitfor_found"
+  fi
+}
+
+#
+# extra wait under a certain condition
+# e.g. if Reading package lists...
+# shows in the log this means that apt-get update is running and installs will probably follow
+# that take some time
+#
+#   #1 l_text_if: the string to wait for as an if condition
+#   #2 l_msg: the message to show if the if condition is true
+#   #3 l_text_until: the string to wait for until
+#   #4 l_msg_until: the message to show if the if condition is false
+#   #5 l_file: the file to monitor
+#   #6 l_interval: the interval in seconds to watch
+#   #7 l_limit_if: how many intervals to wait as a maximum for the if condition
+#   #8 l_limit how many intervals to wait as a maximum for the until condition
+waitif(){
+  local l_text_if="$1"
+  local l_msg="$2"
+  local l_text_until="$3"
+  local l_msg_until="$4"
+  local l_file="$5"
+  local l_interval="$6"
+  local l_limit_if="$7"
+  local l_limit="$8"
+  l_waitif_found=$(dowaitfor "$l_text_if" "$l_file" "$l_interval" "$l_limit_if")
+  if [ "$l_waitif_found" = "timeout" ]
+  then
+    color_msg $green "✅ $l_text_if not found"
+    color_msg $green "$l_msg_until"
+  else
+    color_msg $green "✅ $l_text_if → $l_waitif_found"
+    color_msg $green "$l_msg"
+    waitfor "$l_text_until" "$l_file" "$l_interval" "$l_limit"
+  fi
 }
 
 #
 # execute the given command and wait for the result
 #
 # params
-#   #1 l_cmd: the command to execute 
+#   #1 l_cmd: the command to execute
 #   #2 l_expected: the results to wait for (subshell to call to get the results limited by newline)
 #   #3 l_interval: the interval in seconds to watch
 #   #4 l_limit: how many intervals to wait as a maximum
@@ -69,7 +154,7 @@ waitfor_cmd() {
   for l_expect in $($l_expected)
   do
     # check the log (just once)
-    waitfor "$l_expect" $l_waitforcmdlog $l_interval $l_limit 
+    waitfor "$l_expect" $l_waitforcmdlog $l_interval $l_limit
   done
   unset IFS
   rm $l_waitforcmdlog
@@ -84,7 +169,7 @@ webcheck() {
   l_found=$(curl -s "$l_url" | grep "$l_text")
   if [ $? -ne 0 ]
   then
-    error "❌ $l_text not found at $l_url" 
+    error "❌ $l_text not found at $l_url"
   else
     echo "✅ $l_url • $l_text → $l_found"
   fi
@@ -97,10 +182,10 @@ profiwiki_volumes() {
 
 # cleanup the docker enviroment
 clean() {
-  echo "cleaning docker environment - stopping and removing containers and removing volumes for profiwiki"
+  color_msg $blue "cleaning docker environment - stopping and removing containers and removing volumes for profiwiki"
   docker stop $(docker ps -q --filter="name=profiwiki")
   docker rm $(docker ps -aq --filter="name=profiwiki")
-  for volume in $(profiwiki_volumes) 
+  for volume in $(profiwiki_volumes)
   do
     docker volume rm $volume
   done
@@ -119,22 +204,13 @@ container_name() {
   local l_service="$2"
   local l_prefix="profiwiki"
   local l_version=""
-  case $USER in
-    travis)
-    case $l_wiki in
-      mw1_27_5) l_version=_1_27;;
-      mw1_30_1) l_version=_1_30;;
-      mw1_31_1) l_version=_1_31;;
-    esac 
-    ;;
-    *)
-    case $l_wiki in
-      mw1_27_5) l_version=127;;
-      mw1_30_1) l_version=130;;
-      mw1_31_1) l_version=131;;
-    esac 
-    ;;
+
+  case $l_wiki in
+    mw1_27_5) l_version=_1_27;;
+    mw1_30_1) l_version=_1_30;;
+    mw1_31_1) l_version=_1_31;;
   esac
+
   echo ${l_prefix}${l_version}_${l_service}_1
 }
 
@@ -162,22 +238,37 @@ dotest() {
   clean
   local l_wiki="$1"
   local l_mw_container=$(container_name $l_wiki mw)
-  echo "testing $l_wiki"
+  color_msg $blue "testing $l_wiki"
   # run the install job in the background
   rm nohup.out
   # test with random password
   nohup ./$l_wiki -r&
+  install_pid=$!
+  # make sure the process has opened the log file
+  sleep 0.2
+  # show the progress
+  #tail -f nohup.out
+  tail_pid=$!
+  timestamp
+  color_msg $blue "started install with pid $install_pid log is shown with pid $tail_pid"
+  waitif "Pulling from library/mediawiki" "Waiting until docker pull is finished" "Step 2/4" "Docker download cached" nohup.out 0.2 25 1000
+  timestamp
+  # if docker has not cached the results yet wait
+  waitif "Reading package lists..." "Waiting until docker build is finished" "Step 4/4" "Docker build cached" nohup.out 0.2 25 1000
+  timestamp
   # check that the Apache 2 Webserver is up
   # 30 times 0.2 secs = 6 secs timeout
   waitfor "apache2 -D FOREGROUND" nohup.out 0.2 30
+  timestamp
   # check that the MariaDB is up
   # 50 times 0.2 secs = 10 secs timeout
-  waitfor "port: 3306" nohup.out 0.2 50 
+  waitfor "port: 3306" nohup.out 0.2 50
+  timestamp
   # check the current state of the website
   # no LocalSettings should be available at this time
   local l_mwsite="localhost:8080"
   webcheck $l_mwsite "LocalSettings.php not found"
-  # check running containers 
+  # check running containers
   docker ps
   # copy the phpinfo.php to the mediawiki docker container
   docker cp image/phpinfo.php ${l_mw_container}:/var/www/html
@@ -192,12 +283,16 @@ testall() {
   # loop over the relevant wikis
   for wiki in mw*
   do
+    timestamp
     dotest $wiki
+    timestamp
   done
 }
 
 # stop all running containers
 #dotest mw1_31_1
-echo "Testing for user $USER"
+timestamp
+color_msg $blue "Testing for user $USER"
 testall
+timestamp
 #dotest mw1_31_1
