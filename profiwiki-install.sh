@@ -741,7 +741,7 @@ password_dialog() {
       "$DIALOG" \
 	--clear \
 	--backtitle "$backtitle" \
-	--yesno "Really about ProfiWiki installation?" 6 30
+	--yesno "Really abort ProfiWiki installation?" 6 30
 	case $? in
   	  $DIALOG_OK)
             clear

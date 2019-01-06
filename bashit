@@ -46,10 +46,10 @@ fi
 version="$1"
 service="$2"
 case $version in
-  27) version="127";;
-  30) version="130";;
-  31) version="131";;
+  27) version="1_27";;
+  30) version="1_30";;
+  31) version="1_31";;
   *) usage;;
  esac
-container="${prefix}${version}_${service}_1"
+container="${prefix}_${version}_${service}_1"
 docker exec -it $container bash

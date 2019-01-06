@@ -6,9 +6,9 @@
 #
 get_docker_compose() {
 cat << EOF
-# 
+#
 #  ProfiWiki based on Semantic Media Wiki based on Mediawiki
-# 
+#
 # see
 # https://www.semantic-mediawiki.org/wiki/Help:Using_Docker
 # https://github.com/SemanticMediaWiki/SemanticMediaWiki/issues/1218
@@ -36,12 +36,14 @@ services:
     environment:
       MYSQL_DATABASE: wiki
       MYSQL_USER: wikiuser
-      MYSQL_PASSWORD: $MYSQL_PASSWORD 
-      MYSQL_RANDOM_ROOT_PASSWORD: "yes" 
+      MYSQL_PASSWORD: $MYSQL_PASSWORD
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+    ports:
+      - 3306:3306
     volumes:
       - mysqldata:/var/lib/mysql
 
-# mediawiki 
+# mediawiki
   mw:
     #image: mediawiki:$MEDIAWIKI_VERSION
     # use the Dockerfile in this directory
@@ -66,7 +68,7 @@ EOF
 }
 
 #
-# get the docker file 
+# get the docker file
 #
 get_dockerfile() {
   timestamp=$(date -u +"%Y-%m-%d %H:%M:%S")
@@ -77,7 +79,7 @@ cat << EOF
 #
 FROM mediawiki:$MEDIAWIKI_VERSION
 # responsible for this image setup
-# see also http://www.bitplan.com/index.php/ProfiWiki 
+# see also http://www.bitplan.com/index.php/ProfiWiki
 MAINTAINER Wolfgang Fahl <wf@bitplan.com>
 # install some more utilities
 RUN apt-get update && apt-get install -y \
@@ -93,7 +95,7 @@ RUN apt-get update && apt-get install -y \
   unzip \
   zip && \
   docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ && \
-  docker-php-ext-install gd 
+  docker-php-ext-install gd
 
 # openjdk-8-jdk may be needed later but see
 # https://github.com/puckel/docker-airflow/issues/182
@@ -102,6 +104,9 @@ RUN apt-get update && apt-get install -y \
 # see https://dominicpratt.de/php-7-2-unter-debian-9/
 #RUN wget -q -O- https://packages.sury.org/php/apt.gpg | apt-key add -
 #RUN echo "deb https://packages.sury.org/php/ stretch main" | tee /etc/apt/sources.list.d/php.list
+
+# change ownership of files
+RUN chown -R www-data.www-data /var/www/html
 
 # COPY the install script
 COPY profiwiki-install.sh /root

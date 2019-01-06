@@ -251,10 +251,10 @@ dotest() {
   tail_pid=$!
   timestamp
   color_msg $blue "started install with pid $install_pid log is shown with pid $tail_pid"
-  waitif "Pulling from library/mediawiki" "Waiting until docker pull is finished" "Step 2/4" "Docker download cached" nohup.out 0.2 25 1000
+  waitif "Pulling from library/mediawiki" "Waiting until docker pull is finished" "Step 2/" "Docker download cached" nohup.out 0.2 25 1000
   timestamp
   # if docker has not cached the results yet wait
-  waitif "Reading package lists..." "Waiting until docker build is finished" "Step 4/4" "Docker build cached" nohup.out 0.2 25 1000
+  waitif "Reading package lists..." "Waiting until docker build is finished" "Step 4/" "Docker build cached" nohup.out 0.2 25 1000
   timestamp
   # check that the Apache 2 Webserver is up
   # 30 times 0.2 secs = 6 secs timeout
