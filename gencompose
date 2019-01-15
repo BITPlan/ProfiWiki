@@ -105,6 +105,9 @@ RUN apt-get update && apt-get install -y \
 #RUN wget -q -O- https://packages.sury.org/php/apt.gpg | apt-key add -
 #RUN echo "deb https://packages.sury.org/php/ stretch main" | tee /etc/apt/sources.list.d/php.list
 
+# enable rewrite module
+RUN a2enmod rewrite
+
 # change ownership of files
 RUN chown -R www-data.www-data /var/www/html
 

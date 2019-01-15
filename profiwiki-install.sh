@@ -106,10 +106,10 @@ random_password() {
 # get the database environment
 # - if the LocalSettings already exist from the local l_settings
 # other wise from wiki-config.sh and wiki-passwdconfig.sh
+# param 1 - the path to the local settings
 #
 getdbenv() {
-  local l_mwpath=$(get_mwpath)
-  local l_settings=$l_mwpath/LocalSettings.php
+  local l_settings=$mwpath/LocalSettings.php
   if [ -f $l_settings ]
   then
     # get database parameters from local settings
@@ -210,7 +210,6 @@ checkWikiDB() {
   fi
 }
 
-
 #
 # patch settings
 #
@@ -223,132 +222,48 @@ patch_settings() {
   local l_settings="$1"
   local l_name="$2"
   local l_value="$3"
-  local l_tmp=/tmp/LocalSettings.txt
-  cat << EOF > $l_tmp
+  # check that the value exists
+  grep "\$$l_name[[:space:]]=" "$l_settings" > /dev/null
+  if [ $? -eq 0 ]
+  then
+    color_msg $blue "patching $l_settings setting $l_name to ... $l_value"
+    sed -E -i "" "/\$$l_name[[:space:]]/s/=.*$/= $l_value;/" $l_settings
+  else
+    # add
+    echo "\$${l_name} = $l_value;" >> $l_settings
+  fi
+}
 
-## Uncomment this to disable output compression
-# \$wgDisableOutputCompression = true;
-
-\$wgSitename = "wiki";
-\$wgMetaNamespace = "Wiki";
-
-## The URL base path to the directory containing the wiki;
-## defaults for all runtime URL paths are based off of this.
-## For more information on customizing the URLs
-## (like /w/index.php/Page_title to /wiki/Page_title) please see:
-## https://www.mediawiki.org/wiki/Manual:Short_URL
-\$wgScriptPath = "/mediawiki";
-\$wgScriptExtension = ".php";
-
-## The protocol and server name to use in fully-qualified URLs
-\$wgServer = "http://$hostname";
-
-## The relative URL path to the skins directory
-\$wgStylePath = "\$wgScriptPath/skins";
-
-## The relative URL path to the logo.  Make sure you change this from the default,
-## or else you'll overwrite your logo when you upgrade!
-#\$wgLogo = "\$wgStylePath/common/images/wiki.png";
-\$wgLogo = "/profiwiki/icons/135px-Profiwiki.svg.png";
-
-## UPO means: this is also a user preference option
-
-\$wgEnableEmail = false;
-\$wgEnableUserEmail = true; # UPO
-
-\$wgEmergencyContact = "apache@localhost";
-\$wgPasswordSender = "apache@localhost";
-
-\$wgEnotifUserTalk = false; # UPO
-\$wgEnotifWatchlist = false; # UPO
-\$wgEmailAuthentication = true;
-
-## Database settings
-\$wgDBtype = "mysql";
-\$wgDBserver = "localhost";
-\$wgDBname = "wiki";
-\$wgDBuser = "root";
-\$wgDBpassword = "$MYSQL_PASSWD";
-
-# MySQL specific settings
-\$wgDBprefix = "";
-
-# MySQL table options to use during installation or update
-\$wgDBTableOptions = "ENGINE=InnoDB, DEFAULT CHARSET=utf8";
-
-# Experimental charset support for MySQL 5.0.
-\$wgDBmysql5 = false;
-
-## Shared memory settings
-\$wgMainCacheType = CACHE_NONE;
-\$wgMemCachedServers = array();
-
+#
+# get extra local settings
+#
+extra_LocalSettings() {
+  cat << EOF
 ## To enable image uploads, make sure the 'images' directory
 ## is writable, then set this to true:
 \$wgEnableUploads = true;
 \$wgFileExtensions = array_merge(\$wgFileExtensions, array('doc', 'pdf','ppt','docx', 'docxm','xlsx','xlsm', 'pptx', 'pptxm','jpg','svg','htm','html','xls','xml','zip'));
 
-#\$wgUseImageMagick = true;
-#\$wgImageMagickConvertCommand = "/usr/bin/convert";
-
 # InstantCommons allows wiki to use images from http://commons.wikimedia.org
-\$wgUseInstantCommons = false;
-
-## If you use ImageMagick (or any other shell command) on a
-## Linux server, this will need to be set to the name of an
-## available UTF-8 locale
-\$wgShellLocale = "C.UTF-8";
-
-## If you want to use image uploads under safe mode,
-## create the directories images/archive, images/thumb and
-## images/temp, and make them all writable. Then uncomment
-## this, if it's not already uncommented:
-#\$wgHashedUploadDirectory = false;
-
-## Set \$wgCacheDirectory to a writable directory on the web server
-## to make your wiki go slightly faster. The directory should not
-## be publically accessible from the web.
-#\$wgCacheDirectory = "$IP/cache";
-
-# Site language code, should be one of the list in ./languages/Names.php
-\$wgLanguageCode = "en";
-
-\$wgSecretKey = "16da25466b94b683dab67d4533e11e40e0f7b24a15aaab2b3ef5600143ce0007";
-
-# Site upgrade key. Must be set to a string (default provided) to turn on the
-# web installer while LocalSettings.php is in place
-\$wgUpgradeKey = "80554160e8352086";
-
-## Default skin: you can change the default skin. Use the internal symbolic
-## names, ie 'cologneblue', 'monobook', 'vector':
-\$wgDefaultSkin = "vector";
-
-## For attaching licensing metadata to pages, and displaying an
-## appropriate copyright notice / icon. GNU Free Documentation
-## License and Creative Commons licenses are supported so far.
-\$wgRightsPage = ""; # Set to the title of a wiki page that describes your license/copyright
-\$wgRightsUrl = "";
-\$wgRightsText = "";
-\$wgRightsIcon = "";
-
-# Path to the GNU diff3 utility. Used for conflict resolution.
-\$wgDiff3 = "/usr/bin/diff3";
+\$wgUseInstantCommons = true;
 
 # The following permissions were set based on your choice in the installer
 \$wgGroupPermissions['*']['createaccount'] = false;
 \$wgGroupPermissions['*']['edit'] = false;
 \$wgGroupPermissions['*']['read'] = false;
 
-# Enabled Extensions. Most extensions are enabled by including the base extension file here
-# but check specific extension documentation for more details
+# Enabled extensions. Most of the extensions are enabled by adding
+# wfLoadExtensions('ExtensionName');
+# to LocalSettings.php. Check specific extension documentation for more details.
 # The following extensions were automatically enabled:
-require_once "\$IP/extensions/ParserFunctions/ParserFunctions.php";
-require_once "\$IP/extensions/PdfHandler/PdfHandler.php";
-require_once "\$IP/extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.php";
-require_once "\$IP/extensions/WikiEditor/WikiEditor.php";
-
-# End of automatically generated settings.
-# Add more configuration options below.
+wfLoadExtension( 'CategoryTree' );
+wfLoadExtension( 'ImageMap' );
+wfLoadExtension( 'Nuke' );
+wfLoadExtension( 'ParserFunctions' );
+wfLoadExtension( 'PdfHandler' );
+wfLoadExtension( 'ReplaceText' );
+wfLoadExtension( 'SyntaxHighlight_GeSHi' );
+wfLoadExtension( 'WikiEditor' );
 EOF
 }
 
@@ -380,23 +295,22 @@ apache_path() {
 # get the path for mediawiki and it's settings
 #
 get_mwpath() {
-  local l_apachepath="$1"
+  local l_apachepath=$(apache_path)
+  local l_mwpath=$l_apachepath
   # set the Path to the Mediawiki installation (influenced by MEDIAWIKI ENV variable)
 
   # check for a preinstalled MediaWiki
   # e.g. in digitialocean droplet / a docker container
-  #if [ -d $l_apachepath/extensions ]
-  #then
-    mwpath=$l_apachepath
-  #else
-  #  mwpath=$l_apachepath/$MEDIAWIKI
-  #fi
+  if [ ! -d $l_mwpath/extensions ]
+  then
+    l_mwpath=$l_apachepath/$MEDIAWIKI
+  fi
   # create a symbolic link
   #if [ ! -L $l_apachepath/mediawiki ]
   #then
   #    $sudo ln -s $mwpath $l_apachepath/mediawiki
   #fi
-  echo $mwpath
+  echo $l_mwpath
 }
 
 #
@@ -453,11 +367,40 @@ mediawiki_install() {
 }
 
 #
-# intall media wiki
+# install media wiki
+# paramams
+#   #1: l_option
+#   #2: l_mwpath
+#
+install_mediawiki() {
+  local l_option="$1"
+  local l_mwpath="$2"
+  local l_settings="${l_mwpath}/LocalSettings.php"
+  if [ -f "$l_settings" ] 
+  then
+    color_msg $green "$l_settings already exist"
+  else
+    install_mediawiki_withscript "$1" 
+    if [ -f $l_settings ] 
+    then
+      error "$l_settings not created"
+    else
+      color_msg $green "$l_settings where created"
+    fi
+    patch_settings "$l_settings" wgEnableUploads true
+    patch_settings "$l_settings" wgUseInstantCommons true
+    patch_settings "$l_settings" wgPingBack false 
+    color_msg $blue "adding extra settings to $l_settings"
+    extra_LocalSettings >> $l_settings
+  fi
+}
+
+#
+# install media wiki
 # paramams
 #   #1: l_option
 #
-install_mediawiki() {
+install_mediawiki_withscript() {
   local l_option="$1"
 
   # use the one created by this script instead
@@ -466,47 +409,33 @@ install_mediawiki() {
     color_msg $blue "You choose to skip automatic creation of LocalSettings.php"
     color_msg $blue "you can now install MediaWiki with the url http://$hostname/$MEDIAWIKI_PORT"
   else
-    # MediaWiki LocalSettings.php path
-    #localsettings_dist=$l_mwpath/LocalSettings.php.dist
-    #localsettings=$l_mwpath/LocalSettings.php
+    checkWikiDB
 
-    #if [ -f $localsettings ]
-    #then
-    #    color_msg $green "$localsettings exist"
-    #  SYSOP_PASSWD=`cat $HOME/.sysop.passwd`
-    #else
-      # make sure the Wiki Database exists
-      checkWikiDB
+    # get the database environment variables
+    getdbenv
 
-      # get the database environment variables
-      getdbenv
+    # run the Mediawiki install script
+    color_msg $blue "running MediaWiki installation for $dbname on server $dbserver with user $dbuser"
+    color_msg $blue "setting language to $wikilang and admin to $wikiuser"
+    php $mwpath/maintenance/install.php \
+      --dbname $dbname \
+      --dbpass $dbpass \
+      --dbserver $dbserver \
+      --dbtype mysql \
+      --dbuser $dbuser \
+      --installdbpass $dbpass \
+      --installdbuser $dbuser \
+      --lang $wikilang \
+      --pass $SYSOP_PASSWD \
+      --server http://localhost:$MEDIAWIKI_PORT \
+      --scriptpath / \
+      $wikiname \
+      $wikiuser
 
-      # run the Mediawiki install script
-      color_msg $blue "running MediaWiki installation for $dbname on server $dbserver with user $dbuser"
-      color_msg $blue "setting language to $wikilang and admin to $wikiuser"
-      php $mwpath/maintenance/install.php \
-        --dbname $dbname \
-        --dbpass $dbpass \
-        --dbserver $dbserver \
-        --dbtype mysql \
-        --dbuser $dbuser \
-        --installdbpass $dbpass \
-        --installdbuser $dbuser \
-        --lang $wikilang \
-        --pass $SYSOP_PASSWD \
-        --scriptpath / \
-        $wikiname \
-        $wikiuser
-
-      # fix the realname of the Sysop
-      #    the installscript can't do that
-      #    see https://doc.wikimedia.org/mediawiki-core/master/php/install_8php_source.html)
-      echo "update user set user_real_name='Sysop' where user_name='Sysop'" | dosql
-      # enable the LocalSettings
-      # move the LocalSettings.php created by the installer above to the side
-      # cp -p $mwpath/LocalSettings.php $mwpath/LocalSettings.php.install
-
-    #fi
+    # fix the realname of the Sysop
+    #    the installscript can't do that
+    #    see https://doc.wikimedia.org/mediawiki-core/master/php/install_8php_source.html)
+    echo "update user set user_real_name='Sysop' where user_name='Sysop'" | dosql
     color_msg $blue "Mediawiki has been installed with users:"
     echo "select user_name,user_real_name from user" | dosql
     # remember the installation state
@@ -660,7 +589,7 @@ install_locally() {
   # check the needed installs
   check_needed
   # install mediawiki with the given options
-  mediawiki_install "$option"
+  mediawiki_install "$option" 
 
   # do we have a running mediawiki?
   if [ "$installed" == "true" ]
@@ -853,7 +782,7 @@ do
       composer="true";;
 
     -i|-imw|--installmediawiki)
-      install_mediawiki $option
+      install_mediawiki $option $mwpath
       install="none"
       ;;
 
@@ -894,7 +823,6 @@ do
   esac
   shift
 done
-
 
 # depending on install mode we use
 # docker or install locally
