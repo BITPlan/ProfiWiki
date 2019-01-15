@@ -374,14 +374,13 @@ mediawiki_install() {
 #
 install_mediawiki() {
   local l_option="$1"
-  local l_mwpath="$2"
-  local l_settings="${l_mwpath}/LocalSettings.php"
-  if [ -f "$l_settings" ] 
+  local l_settings="$mwpath/LocalSettings.php"
+  if [ -f "$l_settings" ]
   then
     color_msg $green "$l_settings already exist"
   else
-    install_mediawiki_withscript "$1" 
-    if [ -f $l_settings ] 
+    install_mediawiki_withscript "$1"
+    if [ ! -f $l_settings ] 
     then
       error "$l_settings not created"
     else
@@ -389,7 +388,7 @@ install_mediawiki() {
     fi
     patch_settings "$l_settings" wgEnableUploads true
     patch_settings "$l_settings" wgUseInstantCommons true
-    patch_settings "$l_settings" wgPingBack false 
+    patch_settings "$l_settings" wgPingBack false
     color_msg $blue "adding extra settings to $l_settings"
     extra_LocalSettings >> $l_settings
   fi
@@ -589,7 +588,7 @@ install_locally() {
   # check the needed installs
   check_needed
   # install mediawiki with the given options
-  mediawiki_install "$option" 
+  mediawiki_install "$option"
 
   # do we have a running mediawiki?
   if [ "$installed" == "true" ]
@@ -782,7 +781,7 @@ do
       composer="true";;
 
     -i|-imw|--installmediawiki)
-      install_mediawiki $option $mwpath
+      install_mediawiki $option
       install="none"
       ;;
 
