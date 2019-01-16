@@ -67,7 +67,8 @@ usage() {
   echo "       -c|--clean            : clean - clean up docker containers and volumes (juse with caution)"
   # -h|--help|usage|show this usage
   echo "       -h|--help             : show this usage"
-  echo "    -nols|--no_local_settings: skip automatic creation of LocalSettings.php"
+  echo "       -i                    : use install.php to create LocalSettings.php"
+  echo "    -ismw                    : install semanticmediawiki using composer"
   echo "-composer|--composer         : install composer"
   echo "       -l|--local            : local install (default is docker)"
   echo "       -n|--needed           : check and install needed prequisites"
@@ -603,14 +604,9 @@ docker_restart() {
 }
 
 #
-# local install
+# install semantic mediawiki
 #
-install_locally() {
-  # check the needed installs
-  check_needed
-  # install mediawiki with the given options
-  mediawiki_install "$option"
-
+install_smw() {
   # do we have a running mediawiki?
   if [ "$installed" == "true" ]
   then
@@ -625,20 +621,29 @@ install_locally() {
     # shall we install Semantic Media Wiki?
     if [ "$smw" == "true" ]
     then
-      color_msg $blue "installing semantic mediawiki Version "
+      color_msg $blue "installing semantic mediawiki Version $SMW_VERSION"
       cd $mwpath
       # see https://semantic-mediawiki.org/wiki/Help:Installation/Using_Composer_with_MediaWiki_1.22_-_1.24
       php composer.phar require mediawiki/semantic-media-wiki "~$SMW_VERSION"
       php maintenance/update.php
-cat << EOF >> $localsettings
-  # enableSemantics( "$hostname" );
-EOF
+    fi
+    color_msg $blue "you can now login to MediaWiki with the url http://$hostname/mediawiki"
+    color_msg $blue "    User: Sysop"
+    color_msg $blue "Password: $SYSOP_PASSWD"
   fi
-  color_msg $blue "you can now login to MediaWiki with the url http://$hostname/mediawiki"
-  color_msg $blue "    User: Sysop"
-  color_msg $blue "Password: $SYSOP_PASSWD"
-  echo "$SYSOP_PASSWD" > $HOME/.sysop.passwd
-fi
+}
+
+
+#
+# local install
+#
+install_locally() {
+  # check the needed installs
+  check_needed
+  # install mediawiki with the given options
+  mediawiki_install "$option"
+  install_smw
+
 }
 #
 # check the match of two entered passwords
@@ -834,9 +839,18 @@ do
       export MEDIAWIKI_PORT="$1"
       ;;
 
+    -ismw) 
+     installed="true"
+     composer="true"
+     smw=true
+     install_smw
+     install="none"
+     ;;
+
     -smw|--smw)
-      composer="true";
-      smw=true;;
+      composer="true"
+      smw=true
+      ;;
 
     *)
       params="$params $1"
