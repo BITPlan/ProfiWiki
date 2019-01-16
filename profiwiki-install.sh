@@ -243,8 +243,11 @@ patch_settings() {
 
 #
 # get extra local settings
+#  parameters
+#   #1: l_version
 #
 extra_LocalSettings() {
+  local l_version="$1"
   cat << EOF
 ## To enable image uploads, make sure the 'images' directory
 ## is writable, then set this to true:
@@ -263,18 +266,26 @@ extra_LocalSettings() {
 # wfLoadExtensions('ExtensionName');
 # to LocalSettings.php. Check specific extension documentation for more details.
 # The following extensions were automatically enabled:
-wfLoadExtension( 'CategoryTree' );
 wfLoadExtension( 'ImageMap' );
 wfLoadExtension( 'Nuke' );
-wfLoadExtension( 'OATHAuth' );
 wfLoadExtension( 'ParserFunctions' );
 wfLoadExtension( 'PdfHandler' );
 wfLoadExtension( 'Renameuser' );
-wfLoadExtension( 'ReplaceText' );
 wfLoadExtension( 'SyntaxHighlight_GeSHi' );
 wfLoadExtension( 'WikiEditor' );
 EOF
+case $l_version in
+  1.31*)
+cat << EOF
+# MW 1.31 only
+wfLoadExtension( 'CategoryTree' );
+wfLoadExtension( 'OATHAuth' );
+wfLoadExtension( 'ReplaceText' );
+EOF
+;;
+esac
 }
+
 
 #
 # get the apach path
@@ -399,7 +410,7 @@ install_mediawiki() {
     patch_settings "$l_settings" wgUseInstantCommons true
     patch_settings "$l_settings" wgPingBack false
     color_msg $blue "adding extra settings to $l_settings"
-    extra_LocalSettings >> $l_settings
+    extra_LocalSettings $MEDIAWIKI_VERSION  >> $l_settings
   fi
 }
 
