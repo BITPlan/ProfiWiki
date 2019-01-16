@@ -7,10 +7,10 @@ dbname=wiki
 # the database user to be used
 dbuser=wikiuser
 # The name of the wiki
-wikiname=MediaWiki
+wikiname=wiki
 # The Wiki default user
 wikiuser=Sysop
-# Language of the wiki 
+# Language of the wiki
 wikilang=en
 # the port to use
 export MEDIAWIKI_PORT=8180

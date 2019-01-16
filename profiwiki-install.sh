@@ -104,7 +104,7 @@ random_password() {
 
 #
 # get the database environment
-# - if the LocalSettings already exist from the local l_settings
+# - if the LocalSettings already exists from the local l_settings
 # other wise from wiki-config.sh and wiki-passwdconfig.sh
 # param 1 - the path to the local settings
 #
@@ -227,7 +227,14 @@ patch_settings() {
   if [ $? -eq 0 ]
   then
     color_msg $blue "patching $l_settings setting $l_name to ... $l_value"
-    sed -E -i "" "/\$$l_name[[:space:]]/s/=.*$/= $l_value;/" $l_settings
+    os=`uname`
+    case $os in
+      Darwin )
+        sed -E -i "" "/\$$l_name[[:space:]]/s/=.*$/= $l_value;/" $l_settings
+      ;;
+      *)
+        sed -E -i "/\$$l_name[[:space:]]/s/=.*$/= $l_value;/" $l_settings
+    esac
   else
     # add
     echo "\$${l_name} = $l_value;" >> $l_settings
@@ -259,8 +266,10 @@ extra_LocalSettings() {
 wfLoadExtension( 'CategoryTree' );
 wfLoadExtension( 'ImageMap' );
 wfLoadExtension( 'Nuke' );
+wfLoadExtension( 'OATHAuth' );
 wfLoadExtension( 'ParserFunctions' );
 wfLoadExtension( 'PdfHandler' );
+wfLoadExtension( 'Renameuser' );
 wfLoadExtension( 'ReplaceText' );
 wfLoadExtension( 'SyntaxHighlight_GeSHi' );
 wfLoadExtension( 'WikiEditor' );
@@ -377,10 +386,10 @@ install_mediawiki() {
   local l_settings="$mwpath/LocalSettings.php"
   if [ -f "$l_settings" ]
   then
-    color_msg $green "$l_settings already exist"
+    color_msg $green "$l_settings already exists"
   else
     install_mediawiki_withscript "$1"
-    if [ ! -f $l_settings ] 
+    if [ ! -f $l_settings ]
     then
       error "$l_settings not created"
     else
@@ -415,6 +424,7 @@ install_mediawiki_withscript() {
 
     # run the Mediawiki install script
     color_msg $blue "running MediaWiki installation for $dbname on server $dbserver with user $dbuser"
+    color_msg $blue "wiki name is $wikiname"
     color_msg $blue "setting language to $wikilang and admin to $wikiuser"
     php $mwpath/maintenance/install.php \
       --dbname $dbname \
@@ -427,7 +437,7 @@ install_mediawiki_withscript() {
       --lang $wikilang \
       --pass $SYSOP_PASSWD \
       --server http://localhost:$MEDIAWIKI_PORT \
-      --scriptpath / \
+      --scriptpath "" \
       $wikiname \
       $wikiuser
 
