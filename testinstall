@@ -346,7 +346,7 @@ dotest() {
   webcheck $l_mwsite/index.php/Main_Page "^Main Page$"
   webcheck $l_mwsite/index.php/Special:Version "Nuke"
   # run the composer install for semantic mediawiki
-  waitfor_cmd "docker exec ${l_mw_container} /root/profiwiki-install.sh -ismw 3.0" smw_installed 0.2 700
+  waitfor_cmd "docker exec ${l_mw_container} /root/profiwiki-install.sh -ismw 3.0" smw_installed 0.2 800
   # check that SemanticMediaWiki is installed
   webcheck $l_mwsite/index.php/Special:Version "Semantic MediaWiki"
   # end the log output
