@@ -149,7 +149,13 @@ waitfor_cmd() {
   local l_interval="$3"
   local l_limit="$4"
   local l_waitforcmdlog=/tmp/waitforcmd$$
-  $l_cmd > $l_waitforcmdlog
+  color_msg $blue "waiting for  $l_cmd"
+  nohup $l_cmd &> $l_waitforcmdlog&
+  local l_cmd_pid=$!
+  sleep 0.2
+  tail -f $l_waitforcmdlog&
+  local l_tail_pid=$!
+  color_msg $blue "tail process $l_tail_pid started"
   IFS=$'\n'       # make newlines the only separator
   for l_expect in $($l_expected)
   do
@@ -157,6 +163,8 @@ waitfor_cmd() {
     waitfor "$l_expect" $l_waitforcmdlog $l_interval $l_limit
   done
   unset IFS
+  kill -1 $l_tail_pid
+  kill -1 $l_cmd_pid
   rm $l_waitforcmdlog
 }
 
@@ -166,7 +174,14 @@ waitfor_cmd() {
 webcheck() {
   local l_url="$1"
   local l_text="$2"
-  l_found=$(curl -s "$l_url" | grep "$l_text")
+  local l_sed="sed"
+  os=`uname`
+  case $os in
+    Darwin*)
+     l_sed="gsed"
+     ;;
+  esac
+  l_found=$(curl -s "$l_url" | $l_sed 's/<[^>]*>/\n/g' | grep "$l_text")
   if [ $? -ne 0 ]
   then
     error "❌ $l_text not found at $l_url"
@@ -323,18 +338,19 @@ dotest() {
   # check the result - e.g. the PHP version should show
   webcheck $l_mwsite/phpinfo.php "PHP/7"
   # run the install needed check
-  waitfor_cmd "docker exec -it ${l_mw_container} /root/profiwiki-install.sh -n" needed 0.1 1
+  waitfor_cmd "docker exec  ${l_mw_container} /root/profiwiki-install.sh -n" needed 0.2 30
   # run the install.php script for automatic LocalSettings
-  waitfor_cmd "docker exec -it ${l_mw_container} /root/profiwiki-install.sh -i" installed 0.2 4
+  waitfor_cmd "docker exec  ${l_mw_container} /root/profiwiki-install.sh -i" installed 0.2 30
   # check that the main page appears
   #webcheck $l_mwsite "Login required"
-  webcheck $l_mwsite/index.php/Main_Page "Main Page"
+  webcheck $l_mwsite/index.php/Main_Page "^Main Page$"
   webcheck $l_mwsite/index.php/Special:Version "Nuke"
   # run the composer install for semantic mediawiki
-  waitfor_cmd "docker exec -it ${l_mw_container} /root/profiwiki-install.sh -ismw 3.0" smw_installed 0.2 300
+  waitfor_cmd "docker exec ${l_mw_container} /root/profiwiki-install.sh -ismw 3.0" smw_installed 0.2 600
+  # check that SemanticMediaWiki is installed
   webcheck $l_mwsite/index.php/Special:Version "Semantic MediaWiki"
   # end the log output
-  kill -9 $tail_pid
+  kill -1 $tail_pid
 }
 
 # test all wikis
