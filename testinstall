@@ -331,7 +331,7 @@ dotest() {
   webcheck $l_mwsite/index.php/Main_Page "Main Page"
   webcheck $l_mwsite/index.php/Special:Version "Nuke"
   # run the composer install for semantic mediawiki
-  waitfor_cmd "docker exec -it ${l_mw_container} /root/profiwiki-install.sh -ismw 3.0.0" smw_installed 0.2 300
+  waitfor_cmd "docker exec -it ${l_mw_container} /root/profiwiki-install.sh -ismw 3.0" smw_installed 0.2 300
   # end the log output
   kill -9 $tail_pid
 }

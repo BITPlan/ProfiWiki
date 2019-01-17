@@ -490,10 +490,11 @@ check_composer() {
     # see https://getcomposer.org/doc/00-intro.md
     curl -sS https://getcomposer.org/installer | php
     #curl -O http://getcomposer.org/composer.phar
-    php composer.phar update
   else
     color_msg $green "composer is already available"
   fi
+  # update composer
+  php composer.phar update --no-dev
 }
 
 #
@@ -643,6 +644,7 @@ install_smw() {
       # see https://semantic-mediawiki.org/wiki/Help:Installation/Using_Composer_with_MediaWiki_1.22_-_1.24
       php composer.phar require mediawiki/semantic-media-wiki "~$SMW_VERSION"
       php maintenance/update.php
+      php extensions/SemanticMediaWiki/maintenance/rebuildData.php -d 50 -v
     fi
 
     color_msg $blue "you can now login to MediaWiki with the url http://localhost:$MEDIAWIKI_PORT"
