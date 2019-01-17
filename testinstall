@@ -272,7 +272,7 @@ EOF
 #
 smw_installed() {
 cat << EOF
-mediawiki/semantic-media-wiki: 3.0.0 installed
+finished installation of semantic mediawiki Version
 EOF
 }
 
@@ -332,6 +332,7 @@ dotest() {
   webcheck $l_mwsite/index.php/Special:Version "Nuke"
   # run the composer install for semantic mediawiki
   waitfor_cmd "docker exec -it ${l_mw_container} /root/profiwiki-install.sh -ismw 3.0" smw_installed 0.2 300
+  webcheck $l_mwsite/index.php/Special:Version "Semantic MediaWiki"
   # end the log output
   kill -9 $tail_pid
 }

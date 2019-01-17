@@ -651,6 +651,7 @@ EOF
       php composer.phar require mediawiki/semantic-media-wiki "~$SMW_VERSION"
       php maintenance/update.php --skip-external-dependencies
       php extensions/SemanticMediaWiki/maintenance/rebuildData.php -d 50 -v
+      color_msg $blue "installation of semantic mediawiki Version $SMW_VERSION finished"
     fi
 
     color_msg $blue "you can now login to MediaWiki with the url http://localhost:$MEDIAWIKI_PORT"
