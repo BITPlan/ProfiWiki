@@ -68,7 +68,7 @@ usage() {
   # -h|--help|usage|show this usage
   echo "       -h|--help             : show this usage"
   echo "       -i                    : use install.php to create LocalSettings.php"
-  echo "    -ismw                    : install semanticmediawiki using composer"
+  echo "    -ismw SMW_VERSION        : install semanticmediawiki with the given version using composer"
   echo "-composer|--composer         : install composer"
   echo "       -l|--local            : local install (default is docker)"
   echo "       -n|--needed           : check and install needed prequisites"
@@ -243,6 +243,25 @@ patch_settings() {
 }
 
 #
+# get local settings lines for the extra_Permissions
+#  params:
+#    #1: l_createaccount
+#    #2: l_edit
+#    #3: l_read
+#
+extra_Permissions() {
+  local l_createaccount="$1"
+  local l_edit="$2"
+  local l_read="$3"
+  cat << EOF
+  # The following permissions were set based on your choice in the installer
+  \$wgGroupPermissions['*']['createaccount'] = $l_createaccount;
+  \$wgGroupPermissions['*']['edit'] = $l_edit;
+  \$wgGroupPermissions['*']['read'] = $l_read;
+EOF
+}
+
+#
 # get extra local settings
 #  parameters
 #   #1: l_version
@@ -250,18 +269,6 @@ patch_settings() {
 extra_LocalSettings() {
   local l_version="$1"
   cat << EOF
-## To enable image uploads, make sure the 'images' directory
-## is writable, then set this to true:
-\$wgEnableUploads = true;
-\$wgFileExtensions = array_merge(\$wgFileExtensions, array('doc', 'pdf','ppt','docx', 'docxm','xlsx','xlsm', 'pptx', 'pptxm','jpg','svg','htm','html','xls','xml','zip'));
-
-# InstantCommons allows wiki to use images from http://commons.wikimedia.org
-\$wgUseInstantCommons = true;
-
-# The following permissions were set based on your choice in the installer
-\$wgGroupPermissions['*']['createaccount'] = false;
-\$wgGroupPermissions['*']['edit'] = false;
-\$wgGroupPermissions['*']['read'] = false;
 
 # Enabled extensions. Most of the extensions are enabled by adding
 # wfLoadExtensions('ExtensionName');
@@ -406,10 +413,21 @@ install_mediawiki() {
     else
       color_msg $green "$l_settings where created"
     fi
+    ## To enable image uploads, make sure the 'images' directory
+    ## is writable, then set this to true:
+    # https://www.mediawiki.org/wiki/Manual:$wgEnableUploads
     patch_settings "$l_settings" wgEnableUploads true
+    # https://www.mediawiki.org/wiki/Manual:$wgFileExtensions
+    patch_settings "$l_settings" wgFileExtensions "array_merge(\$wgFileExtensions, array('doc', 'docx', 'docxm','jpg','htm','html','pdf','png','ppt','pptx', 'pptxm','svg','xls','xml','xlsx','xlsm','zip'))"
+    # InstantCommons allows wiki to use images from http://commons.wikimedia.org
     patch_settings "$l_settings" wgUseInstantCommons true
+    # MediaWiki's big brother flag
+    # https://www.mediawiki.org/wiki/Manual:$wgPingback
     patch_settings "$l_settings" wgPingBack false
+    # add extra setting
     color_msg $blue "adding extra settings to $l_settings"
+    # create=false edit=false read=true
+    extra_Permissions false false true >> $l_settings
     extra_LocalSettings $MEDIAWIKI_VERSION  >> $l_settings
   fi
 }
@@ -850,6 +868,12 @@ do
      installed="true"
      composer="true"
      smw=true
+     shift
+     if [ $# -lt 1 ]
+     then
+       usage
+     fi
+     export SMW_VERSION="$1"
      get_passwords /root/wiki-pwconfig.sh
      install_smw
      install="none"
