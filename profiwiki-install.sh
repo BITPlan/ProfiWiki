@@ -641,9 +641,15 @@ install_smw() {
     then
       color_msg $blue "installing semantic mediawiki Version $SMW_VERSION"
       cd $mwpath
+      local l_settings="$mwpath/LocalSettings.php"
+      cat << EOF >> $l_settings
+  # see https://www.semantic-mediawiki.org/wiki/Help:Installation/Using_Composer_with_MediaWiki_1.25%2B
+  enableSemantics();
+EOF
+
       # see https://semantic-mediawiki.org/wiki/Help:Installation/Using_Composer_with_MediaWiki_1.22_-_1.24
       php composer.phar require mediawiki/semantic-media-wiki "~$SMW_VERSION"
-      php maintenance/update.php
+      php maintenance/update.php --skip-external-dependencies
       php extensions/SemanticMediaWiki/maintenance/rebuildData.php -d 50 -v
     fi
 
