@@ -294,12 +294,12 @@ finished installation of semantic mediawiki Version
 EOF
 }
 
+
+
 # test the given installation
 # param #1 start script for wiki installation
-dotest() {
+dotest_smwinstall() {
   local l_wiki="$1"
-	mwport=$(grep MEDIAWIKI_PORT wiki-config.sh | cut -f2 -d"=")
-  check_ports 3306 $mwport
   local l_mw_container=$(container_name $l_wiki mw)
   color_msg $blue "testing $l_wiki"
   # run the install job in the background
@@ -353,6 +353,18 @@ dotest() {
   webcheck $l_mwsite/index.php/Special:Version "Semantic MediaWiki"
   # end the log output
   kill -1 $tail_pid
+  # commit the container
+  docker commit ${l_mw_container} bitplan/profiwiki_$l_wiki:0.0.1
+}
+
+# test the given installation
+# param #1 start script for wiki installation
+dotest() {
+  local l_wiki="$1"
+  mwport=$(grep MEDIAWIKI_PORT wiki-config.sh | cut -f2 -d"=")
+  check_ports 3306 $mwport
+
+  dotest_smwinstall "$l_wiki"
 }
 
 # test all wikis
@@ -361,6 +373,7 @@ testall() {
   for wiki in mw*
   do
     timestamp
+    clean
     dotest $wiki
     timestamp
   done
@@ -376,8 +389,12 @@ do
       clean
     ;;
     -a|--all)
-    testall
+      testall
     ;;
+    -m)
+      wiki=$1
+      dotest $wiki
+      ;;
   esac
   shift
 done

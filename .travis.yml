@@ -29,11 +29,9 @@ install:
 
 script:
   # testinstall 
-  - ./testinstall
-  #- testinstall 8080
-  #- testinstall 8081
-  #- testinstall 8082
-  #- testinstall 8083
+  - ./testinstall -c -m mw1_27_5 
+  - ./testinstall -c -m mw1_30_1
+  - ./testinstall -c -m mw1_31_1 
 
 after_script:
   - docker-compose stop
