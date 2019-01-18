@@ -20,7 +20,8 @@ mwpath=/var/www/html
 install_dir=$(dirname $0)
 
 # name of image
-name=profiwiki
+IMAGE_PREFIX=mediawiki
+
 # default installation mode ist docker
 install="docker"
 
@@ -904,9 +905,9 @@ done
 case $install in
   docker)
     docker_autoinstall
-    color_msg $blue "installing $name using docker on $(hostname) os $(uname)"
-    name=$(echo profiwiki${MEDIAWIKI_VERSION} | sed 's/\.//g')
-    color_msg $blue "creating $name docker compose"
+    color_msg $blue "installing ${IMAGE_PREFIX} using docker on $(hostname) os $(uname)"
+    name=$(echo ${IMAGE_PREFIX}${MEDIAWIKI_VERSION} | sed 's/\.//g')
+    color_msg $blue "creating ${name} docker compose"
     if [ ! -d $name ]
     then
       mkdir $name
