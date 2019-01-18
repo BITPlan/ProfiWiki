@@ -39,6 +39,20 @@ error() {
 }
 
 #
+# show usage
+#
+usage() {
+  echo "$0"
+  echo ""
+  echo "options: "
+  echo "       -a|--all              : testall available mediawiki versions"
+  echo "       -c|--clean            : clean - clean up docker containers and volumes (juse with caution)"
+  echo "       -h|--help             : show this usage"
+  echo "       -m VERSION            : test the given install script"
+  exit 1
+}
+
+#
 # get a time stamp
 #
 timestamp() {
@@ -385,13 +399,23 @@ color_msg $blue "Testing for user $USER"
 while test $# -gt 0
 do
   case $1 in
-    -c|--clean)
-      clean
-    ;;
     -a|--all)
       testall
     ;;
+
+    -h|--help)
+      usage
+    ;;
+    -c|--clean)
+      clean
+    ;;
+
     -m)
+      shift
+      if [ $# -lt 1 ]
+      then
+        usage
+      fi
       wiki=$1
       dotest $wiki
       ;;
