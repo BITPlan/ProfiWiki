@@ -120,6 +120,7 @@ getdbenv() {
     dbuser=`egrep '^.wgDBuser'     $l_settings | cut -d'"' -f2`
     dbpass=`egrep '^.wgDBpassword' $l_settings | cut -d'"' -f2`
   else
+    # get parameters from config scripts
     . $install_dir/wiki-config.sh
     . $install_dir/wiki-pwconfig.sh
     dbpass=$MYSQL_PASSWORD

@@ -207,20 +207,20 @@ webcheck() {
   fi
 }
 
-# get all  volumes
-volumes() {
-  docker volume ls | grep -v "VOLUME" | grep "${IMAGE_PREFIX}" | cut -c21-
-}
+#
+# get the mediawiki version suffix
+# params
+#   #1: l_wiki - the wiki name e.g. mw1_27_5
+mwversion_suffix() {
+  local l_wiki="$1"
+  local l_version=""
 
-# cleanup the docker enviroment
-clean() {
-  color_msg $blue "cleaning docker environment - stopping and removing containers and removing volumes for ${IMAGE_PREFIX}"
-  docker stop $(docker ps -q --filter="name=$IMAGE_PREFIX")
-  docker rm $(docker ps -aq --filter="name=$IMAGE_PREFIX")
-  for volume in $(volumes)
-  do
-    docker volume rm $volume
-  done
+  case $l_wiki in
+    mw1_27_5) l_version=127;;
+    mw1_30_1) l_version=130;;
+    mw1_31_1) l_version=131;;
+  esac
+  echo $l_version
 }
 
 #
@@ -235,15 +235,27 @@ container_name() {
   local l_wiki="$1"
   local l_service="$2"
   local l_prefix="$IMAGE_PREFIX"
-  local l_version=""
-
-  case $l_wiki in
-    mw1_27_5) l_version=127;;
-    mw1_30_1) l_version=130;;
-    mw1_31_1) l_version=131;;
-  esac
-
+  local l_version=$(mwversion_suffix "$l_wiki")
   echo ${l_prefix}${l_version}_${l_service}_1
+}
+
+# get all  volumes
+volumes() {
+  local l_version="$1"
+  docker volume ls | grep -v "VOLUME" | grep "${IMAGE_PREFIX}${l_version}" | cut -c21-
+}
+
+# cleanup the docker enviroment
+clean() {
+  local l_wiki="$1"
+  local l_version=$(mwversion_suffix "$l_wiki")
+  color_msg $blue "cleaning docker environment - stopping and removing containers and removing volumes for ${IMAGE_PREFIX}"
+  docker stop $(docker ps -q --filter="name=${IMAGE_PREFIX}${l_version}")
+  docker rm $(docker ps -aq --filter="name=${IMAGE_PREFIX}${l_version}")
+  for volume in $(volumes $l_version)
+  do
+    docker volume rm $volume
+  done
 }
 
 #
@@ -387,7 +399,7 @@ testall() {
   for wiki in mw*
   do
     timestamp
-    clean
+    clean $wiki
     dotest $wiki
     timestamp
   done
@@ -407,7 +419,12 @@ do
       usage
     ;;
     -c|--clean)
-      clean
+      if [ $# -lt 1 ]
+      then
+        usage
+      fi
+      wiki=$1
+      clean $wiki
     ;;
 
     -m)
