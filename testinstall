@@ -246,14 +246,25 @@ volumes() {
 }
 
 # cleanup the docker enviroment
+#   #1: l_wiki - the wiki name e.g. mw1_27_5
 clean() {
   local l_wiki="$1"
   local l_version=$(mwversion_suffix "$l_wiki")
-  color_msg $blue "cleaning docker environment - stopping and removing containers and removing volumes for ${IMAGE_PREFIX}"
-  docker stop $(docker ps -q --filter="name=${IMAGE_PREFIX}${l_version}")
-  docker rm $(docker ps -aq --filter="name=${IMAGE_PREFIX}${l_version}")
+  local l_name=${IMAGE_PREFIX}${l_version}
+  color_msg $blue "cleaning docker environment - stopping and removing containers and removing volumes for ${l_name}"
+  for container in $(docker ps -q --filter="name=${l_name}")
+  do
+    color_msg $blue "stopping container $container"
+    docker stop $container
+  done
+  for container in  $(docker ps -aq --filter="name=${l_name}")
+  do
+    color_msg $blue "removing container $container"
+    docker rm $container
+  done
   for volume in $(volumes $l_version)
   do
+    color_msg $blue "removing volume $volume"
     docker volume rm $volume
   done
 }
@@ -396,11 +407,21 @@ dotest() {
 # test all wikis
 testall() {
   # loop over the relevant wikis
+  previouswiki=""
   for wiki in mw*
   do
     timestamp
-    clean $wiki
+    # we need to clean the wiki we just tested
+    if [ "$previouswiki" != "" ]
+    then
+      clean "$previouswiki"
+    fi
+    # we need to clean the current wiki (if there are remnants from a previous call of this script)
+    clean $l_wiki
+
+    # we need to test the relevant wiki
     dotest $wiki
+    previouswiki="$wiki"
     timestamp
   done
 }
