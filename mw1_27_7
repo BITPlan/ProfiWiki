@@ -1,5 +1,5 @@
 #!/bin/bash
 export MEDIAWIKI_VERSION=1.27
-export MEDIAWIKI=mediawiki-1.27.5
+export MEDIAWIKI=mediawiki-1.27.7
 export SMW_VERSION=3.0.0
 ./profiwiki-install.sh -smw --mysql "$@"

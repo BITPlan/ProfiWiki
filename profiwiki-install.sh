@@ -1,9 +1,11 @@
+#!/bin/bash
 #
-# Copyright (c) 2015-2018 BITPlan GmbH
+# Copyright (c) 2015-2019 BITPlan GmbH
 #
 # WF 2015-10-23
 # WF 2017-06-01 - Syntax highlighting issue checked
 # WF 2018-12-30 - Ubuntu 18 check
+# WF 2019-10-13 -
 #
 # Profiwiki installation
 #
@@ -653,7 +655,7 @@ install_smw() {
 EOF
 
       # see https://semantic-mediawiki.org/wiki/Help:Installation/Using_Composer_with_MediaWiki_1.22_-_1.24
-      php composer.phar require mediawiki/semantic-media-wiki "~$SMW_VERSION"
+      php composer.phar require mediawiki/semantic-media-wiki "$SMW_VERSION"
       php maintenance/update.php --skip-external-dependencies
       php extensions/SemanticMediaWiki/maintenance/rebuildData.php -d 50 -v
       color_msg $blue "finished installation of semantic mediawiki Version $SMW_VERSION"

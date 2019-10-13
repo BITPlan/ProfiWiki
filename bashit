@@ -1,10 +1,10 @@
 #!/bin/bash
 # WF 2018-12-29
 # call a bash inside the docker container
-prefix=profiwiki
+IMAGE_PREFIX=mediawiki
 
 #
-# a colored message 
+# a colored message
 #   params:
 #     1: l_color - the color of the message
 #     2: l_msg - the message to display
@@ -33,8 +33,8 @@ error() {
 # show usage
 #
 usage() {
-  echo "$0 [27|30|31] [db|mw]"
-  echo "e.g $0 27 db will call a bash in the mediawiki 1.27.5 mariadb container"
+  echo "$0 [27|30|31|33] [db|mw]"
+  echo "e.g $0 27 db will call a bash in the mediawiki 1.27.7 mariadb container"
   exit 1
 }
 
@@ -49,7 +49,8 @@ case $version in
   27) version="127";;
   30) version="130";;
   31) version="131";;
+  33) version="133";;
   *) usage;;
  esac
-container="${prefix}${version}_${service}_1"
+container="${IMAGE_PREFIX}${version}_${service}_1"
 docker exec -it $container bash
