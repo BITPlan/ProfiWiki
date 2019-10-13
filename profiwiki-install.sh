@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # Copyright (c) 2015-2018 BITPlan GmbH
 #
@@ -14,7 +13,7 @@
 # do not uncomment this - it will spoil the $? handling
 #set -e
 
-# create globl scope variables
+# create global scope variables
 apachepath=/var/www/html
 mwpath=/var/www/html
 install_dir=$(dirname $0)
@@ -93,7 +92,7 @@ timestamp() {
 #
 random_password_len() {
   local l_len="$1"
-  python -c "import string;import random;print ''.join(random.SystemRandom().choice(string.letters + '!?+-%_' +string.digits) for _ in range($l_len))"
+  python -c "import string;import random;print (''.join(random.SystemRandom().choice(string.ascii_uppercase + string.ascii_lowercase + '!?+-%_/:()#$&' +string.digits) for x in range($l_len)))"
   # does not work on macos
   # date +%N | shasum | base64 | head -c $l_len ; echo
 }
@@ -598,7 +597,11 @@ check_needed() {
 docker_autoinstall() {
   autoinstall docker docker docker
   # add the current user to the docker group to avoid need of sudo
-  sudo usermod -aG docker $(id -un)
+  which usermod
+  if [ $? -eq 0 ]
+  then
+    sudo usermod -aG docker $(id -un)
+  fi
   autoinstall docker-compose docker-compose docker-compose
 }
 

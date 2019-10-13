@@ -31,7 +31,7 @@ services:
 #  MySQL compatible relational database
   db:
 # use original image
-    image: mariadb:10.3.10
+    image: mariadb:10.3
     restart: always
     environment:
       MYSQL_DATABASE: wiki
@@ -90,7 +90,7 @@ RUN apt-get update && apt-get install -y \
   libfreetype6-dev \
   libpng-dev \
   libzip-dev \
-  mariadb-client-core-10.3 \
+  mariadb-client-core-10.1 \
   vim \
   unzip \
   zip && \
