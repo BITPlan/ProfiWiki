@@ -32,6 +32,7 @@ script:
   - ./testinstall -c mw1_27_5 -m mw1_27_5
   - ./testinstall -c mw1_30_1 -m mw1_30_1
   - ./testinstall -c mw1_31_1 -m mw1_31_1 
+  - ./testinstall -c mw1_33_1 -m mw1_33_1 
 
 after_script:
   - docker-compose stop
