@@ -11,6 +11,7 @@ class TestProfiWiki(Basetest):
     test ProfiWiki
     """
     
+    
     def test_system(self):
         """
         test system pre requisites
@@ -20,3 +21,11 @@ class TestProfiWiki(Basetest):
         debug=True
         if debug:
             print(info)
+            
+    def test_create(self):
+        """
+        test creating a wiki
+        """
+        pw=ProfiWiki(debug=True)
+        #pw.create(prefix="pw",port=9142)
+        

@@ -32,6 +32,11 @@ class ProfiWikiCmd():
         #script_path=Path(__file__)
         parser = ArgumentParser(description=description, formatter_class=RawDescriptionHelpFormatter)
         parser.add_argument("-a", "--about", help="show about info [default: %(default)s]", action="store_true")
+        parser.add_argument("-c", "--create",action="store_true",help="create the wiki")
+        parser.add_argument("-d", "--debug", dest="debug",   action="store_true", help="set debug [default: %(default)s]")
+        parser.add_argument("--port", type=int, default=9042, help="the port to serve from [default: %(default)s]")
+        parser.add_argument("--prefix",default="pw")
+        parser.add_argument('-q', '--quiet', help="not verbose [default: %(default)s]",action="store_true")
         parser.add_argument("-i", "--info", help="show system info", action="store_true")
         parser.add_argument("-V", "--version", action='version', version=version_msg)
         return parser
@@ -59,10 +64,11 @@ def main(argv=None):  # IGNORE:C0111
             print(program_version_message)
             print(f"see {Version.doc_url}")
             webbrowser.open(Version.doc_url)
+        pw=ProfiWiki(args) 
         if args.info:
-            pw=ProfiWiki()
             info=pw.system_info()
             print(info)
+        pw.work()
 
     except KeyboardInterrupt:
         ###
