@@ -1,6 +1,10 @@
 # BITPlan ProfiWiki
 BITPlan's Professional SemanticMediaWiki
 
+[![Join the discussion at https://github.com/BITPlan/ProfiWiki/discussions](https://img.shields.io/github/discussions/BITPlan/ProfiWiki)](https://github.com/BITPlan/ProfiWiki/discussions)
+[![pypi](https://img.shields.io/pypi/pyversions/ProfiWiki)](https://pypi.org/project/ProfiWiki/)
+[![Github Actions Build](https://github.com/BITPlan/ProfiWiki/workflows/Build/badge.svg?branch=main)](https://github.com/BITPlan/ProfiWiki/actions?query=workflow%3ABuild+branch%3Amain)
+[![PyPI Status](https://img.shields.io/pypi/v/ProfiWiki.svg)](https://pypi.python.org/pypi/ProfiWiki/)
 [![GitHub issues](https://img.shields.io/github/issues/BITPlan/ProfiWiki.svg)](https://github.com/BITPlan/ProfiWiki/issues)
 [![GitHub issues](https://img.shields.io/github/issues-closed/BITPlan/ProfiWiki.svg)](https://github.com/BITPlan/ProfiWiki/issues/?q=is%3Aissue+is%3Aclosed)
 [![GitHub](https://img.shields.io/github/license/BITPlan/ProfiWiki.svg)](https://www.apache.org/licenses/LICENSE-2.0)

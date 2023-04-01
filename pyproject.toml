@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "pyProfiWiki"
+name = "ProfiWiki"
 authors = [
   {name = "Wolfgang Fahl", email = "wf@bitplan.com"}
 
