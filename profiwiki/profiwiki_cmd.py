@@ -33,6 +33,7 @@ class ProfiWikiCmd():
         parser = ArgumentParser(description=description, formatter_class=RawDescriptionHelpFormatter)
         parser.add_argument("-a", "--about", help="show about info [default: %(default)s]", action="store_true")
         parser.add_argument("-c", "--create",action="store_true",help="create the wiki")  
+        parser.add_argument("--cron",action="store_true",help="start cron service")  
         parser.add_argument("-d", "--debug", dest="debug",   action="store_true", help="set debug [default: %(default)s]")
         parser.add_argument("-fa", "--fontawesome",   action="store_true", help="install fontawesome")
         parser.add_argument("-fr", "--forcerebuild",   action="store_true", help="force the rebuild")
