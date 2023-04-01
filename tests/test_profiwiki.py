@@ -26,9 +26,10 @@ class TestProfiWiki(Basetest):
         test creating a wiki
         """
         pw=ProfiWiki(debug=True)
+        mwCluster=pw.getMwCluster(prefix="pw",port=9142)
         forceRebuild=True
-        pw.create(prefix="pw",port=9142,forceRebuild=forceRebuild)
-        pw.check(prefix="pw",port=9142)
+        pw.create(mwCluster,forceRebuild=forceRebuild)
+        pw.check(mwCluster)
         
     def test_install_plantuml(self):
         """
@@ -39,4 +40,11 @@ class TestProfiWiki(Basetest):
         pmw,_pdb=pw.getProfiWikiContainers(mwCluster)
         pmw.install_plantuml()
         pass
+    
+    def test_killremove(self):
+        pw=ProfiWiki(debug=True)
+        mwCluster=pw.getMwCluster(prefix="pw", port=9142)
+        pmw,pdb=pw.getProfiWikiContainers(mwCluster)
+        pmw.killremove()
+        pdb.killremove()
         

@@ -44,8 +44,13 @@ class ProfiWiki():
         """
         work as instructed by the arguments
         """
+        mwCluster=self.getMwCluster(self.args.prefix,self.args.port)
         if self.args.create:
-            self.create(self.args.prefix,self.args.port)
+            self.create(mwCluster, self.args.forcerebuild)
+        if self.args.killremove:
+            pmw,pdb=self.getProfiWikiContainers(mwCluster)
+            pmw.killremove()
+            pdb.killremove()
         
     def getMwCluster(self,prefix,port): 
         """
@@ -88,17 +93,16 @@ class ProfiWiki():
         pdb=ProfiWikiContainer(db)
         return pmw,pdb
         
-    def check(self,prefix,port):
+    def check(self,mwCluster):
         """
         check
         """
-        mwCluster=self.getMwCluster(prefix, port)
         mwCluster.check()
             
-    def create(self,prefix,port,forceRebuild:bool=False):
+    def create(self,mwCluster,forceRebuild:bool=False):
         """
         create a mediawiki
         """
-        mwCluster=self.getMwCluster(prefix, port)
         mwCluster.start(forceRebuild=forceRebuild)
+        
     
