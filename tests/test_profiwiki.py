@@ -11,7 +11,6 @@ class TestProfiWiki(Basetest):
     test ProfiWiki
     """
     
-    
     def test_system(self):
         """
         test system pre requisites
@@ -27,5 +26,17 @@ class TestProfiWiki(Basetest):
         test creating a wiki
         """
         pw=ProfiWiki(debug=True)
-        #pw.create(prefix="pw",port=9142)
+        forceRebuild=True
+        pw.create(prefix="pw",port=9142,forceRebuild=forceRebuild)
+        pw.check(prefix="pw",port=9142)
+        
+    def test_install_plantuml(self):
+        """
+        test installing plantuml
+        """
+        pw=ProfiWiki(debug=True)
+        mwCluster=pw.getMwCluster(prefix="pw", port=9142)
+        pmw,_pdb=pw.getProfiWikiContainers(mwCluster)
+        pmw.install_plantuml()
+        pass
         

@@ -6,6 +6,7 @@ Created on 2023-04-01
 import platform
 import os
 from mwdocker.mwcluster import MediaWikiCluster
+from profiwiki.docker import ProfiWikiContainer
 
 class ProfiWiki():
     """
@@ -45,22 +46,56 @@ class ProfiWiki():
         """
         if self.args.create:
             self.create(self.args.prefix,self.args.port)
+        
+    def getMwCluster(self,prefix,port): 
+        """
+        get the mediawiki cluster
+        """   
+        self.mw_version="1.39.2"
+        self.versions=[self.mw_version]
+        self.user=MediaWikiCluster.defaultUser
+        self.password=MediaWikiCluster.defaultPassword
+        self.extensionNameList=["Admin Links","Diagrams","Header Tabs","ImageMap","MagicNoCache","Maps9",
+                               "Mermaid","MsUpload","Nuke","Page Forms","ParserFunctions","PDFEmbed","Renameuser",
+                               "Replace Text","Semantic Result Formats","SyntaxHighlight","Variables"]
+        self.smwVersion="4.1.0"
+        self.container_name=f"{prefix}-{port}"
+        if self.verbose:
+            os_path=os.environ["PATH"]
+            paths=["/usr/local/bin"]
+            for path in paths:
+                if not path in os_path:
+                    os.environ["PATH"]=f"{os_path}{os.pathsep}{path}"
+            if self.debug:
+                print(f"""modified PATH from {os_path} to \n{os.environ["PATH"]}""")
+            print(f"creating ProfiWiki {prefix} using port {port}")
+        mwCluster=MediaWikiCluster(versions=self.versions,
+            user=self.user,
+            password=self.password,
+            container_name=self.container_name,
+                                       extensionNameList=self.extensionNameList,
+                                       smwVersion=self.smwVersion)
+        mwCluster.createApps()
+        return mwCluster
+    
+    def getProfiWikiContainers(self,mwCluster):
+        mwApp=mwCluster.apps[self.mw_version]
+        mw,db=mwApp.getContainers()
+        pmw=ProfiWikiContainer(mw)
+        pdb=ProfiWikiContainer(db)
+        return pmw,pdb
+        
+    def check(self,prefix,port):
+        """
+        check
+        """
+        mwCluster=self.getMwCluster(prefix, port)
+        mwCluster.check()
             
     def create(self,prefix,port,forceRebuild:bool=False):
         """
         create a mediawiki
         """
-        mw_version="1.39.2"
-        container_name=f"{prefix}-{port}"
-        if self.verbose:
-            print(f"creating ProfiWiki {prefix} using port {port}")
-            versions=[mw_version]
-            user=user=MediaWikiCluster.defaultUser
-            password=MediaWikiCluster.defaultPassword
-            extensionNameList=["Admin Links","Diagrams","Header Tabs","ImageMap","MagicNoCache","Maps9",
-                               "Mermaid","MsUpload","Nuke","Page Forms","ParserFunctions","PDFEmbed","Renameuser",
-                               "Replace Text","Semantic Result Formats","SyntaxHighlight","Variables"]
-            mwCluster=MediaWikiCluster(versions=versions,user=user,password=password,container_name=container_name,extensionNameList=extensionNameList)
-            mwCluster.createApps()
-            mwCluster.start(forceRebuild=forceRebuild)
+        mwCluster=self.getMwCluster(prefix, port)
+        mwCluster.start(forceRebuild=forceRebuild)
     
