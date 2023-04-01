@@ -39,6 +39,12 @@ class ProfiWikiContainer():
             self.log_action("killing and removing")
             self.dc.container.kill()
             self.dc.container.remove()
+
+    def start_cron(self):
+        """
+        Starting periodic command scheduler: cron.
+        """        
+        self.dc.container.execute(["sh","-c","service","cron","start"],tty=True)
         
     def install_plantuml(self):
         """

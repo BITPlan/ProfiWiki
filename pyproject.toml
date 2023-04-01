@@ -15,7 +15,9 @@ readme = "README.md"
 license= "Apache-2.0"
 dependencies = [
   #https://pypi.org/project/pymediawikidocker/
-  "pymediawikidocker"
+  "pymediawikidocker",
+  #https://pypi.org/project/py-3rdparty-mediawiki/
+  "py-3rdparty-mediawiki"
 ]
 
 requires-python = ">=3.8"

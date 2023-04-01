@@ -53,6 +53,9 @@ class ProfiWiki():
         if self.args.fontawesome:
             pmw,_pdb=self.getProfiWikiContainers(mwCluster)
             pmw.install_fontawesome()
+        if self.args.cron:
+            pmw,_pdb=self.getProfiWikiContainers(mwCluster)
+            pmw.start_cron()
         if self.args.killremove:
             pmw,pdb=self.getProfiWikiContainers(mwCluster)
             pmw.killremove()
