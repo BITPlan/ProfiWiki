@@ -52,6 +52,8 @@ class ProfiWiki():
         get the mediawiki cluster
         """   
         self.mw_version="1.39.2"
+        self.prefix=prefix
+        self.port=port
         self.versions=[self.mw_version]
         self.user=MediaWikiCluster.defaultUser
         self.password=MediaWikiCluster.defaultPassword
@@ -73,8 +75,9 @@ class ProfiWiki():
             user=self.user,
             password=self.password,
             container_name=self.container_name,
-                                       extensionNameList=self.extensionNameList,
-                                       smwVersion=self.smwVersion)
+            extensionNameList=self.extensionNameList,
+            basePort=self.port,
+            smwVersion=self.smwVersion)
         mwCluster.createApps()
         return mwCluster
     
