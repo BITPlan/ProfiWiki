@@ -84,7 +84,7 @@ class ProfiWiki():
                     os.environ["PATH"]=f"{os_path}{os.pathsep}{path}"
             if self.debug:
                 print(f"""modified PATH from {os_path} to \n{os.environ["PATH"]}""")
-            print(f"creating ProfiWiki {prefix} using port {port}")
+            print(f"ProfiWiki {prefix} using port {port}")
         mwCluster=MediaWikiCluster(versions=self.versions,
             user=self.user,
             password=self.password,
