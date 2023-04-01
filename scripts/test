@@ -1,6 +1,10 @@
 #/bin/bash
 # WF 2023-02-14
+
+
+
 # Run tests with green
+greentest() {
 pip list | grep green | grep -v greenlet
 if [ $? -ne 0 ]
 then
@@ -8,3 +12,6 @@ then
 fi
 
 green tests -s 1
+}
+# standard tests
+python -m unittest discover
