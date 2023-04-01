@@ -4,6 +4,7 @@ Created on 2023-04-01
 @author: wf
 '''
 from mwdocker.docker import DockerContainer
+from python_on_whales import DockerException
 import tempfile
 
 class ProfiWikiContainer():
@@ -83,5 +84,9 @@ a2enconf font-awesome
         # make executable
         self.dc.container.execute(["chmod","+x",script_path])
         self.dc.container.execute([script_path],tty=True)
-        self.dc.container.execute(["service","apache2","restart"])
+        try:
+            self.dc.container.execute(["service","apache2","restart"])
+        except DockerException as e:
+            if not e.return_code==143:
+                raise e
         pass
