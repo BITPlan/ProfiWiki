@@ -17,11 +17,9 @@ Semantic MediaWiki with fully automated install.
 Will get your Semantic MediaWiki running in a few minutes.
 
 ### Documentation
-* [Wiki](http://www.bitplan.com/ProfiWiki)
+* [Wiki](https://wiki.bitplan.com/index.php/ProfiWiki)
 ### Features
 * Docker compose based
 * based on official Mediawiki docker image
 ### Links 
 * https://github.com/SemanticMediaWiki/SemanticMediaWiki/issues/1218
-### History
-* 0.0.1 2019-01-02 [implements #1 - Basic Installation](https://github.com/BITPlan/ProfiWiki/issues/1)
