@@ -47,6 +47,12 @@ class ProfiWiki():
         mwCluster=self.getMwCluster(self.args.prefix,self.args.port)
         if self.args.create:
             self.create(mwCluster, self.args.forcerebuild)
+        if self.args.plantuml:
+            pmw,_pdb=self.getProfiWikiContainers(mwCluster)
+            pmw.install_plantuml()
+        if self.args.fontawesome:
+            pmw,_pdb=self.getProfiWikiContainers(mwCluster)
+            pmw.install_fontawesome()
         if self.args.killremove:
             pmw,pdb=self.getProfiWikiContainers(mwCluster)
             pmw.killremove()

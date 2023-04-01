@@ -41,6 +41,15 @@ class TestProfiWiki(Basetest):
         pmw.install_plantuml()
         pass
     
+    def test_install_fontawesome(self):
+        """
+        test installing font awesome
+        """
+        pw=ProfiWiki(debug=True)
+        mwCluster=pw.getMwCluster(prefix="pw", port=9142)
+        pmw,_pdb=pw.getProfiWikiContainers(mwCluster)
+        pmw.install_fontawesome()
+    
     def test_killremove(self):
         pw=ProfiWiki(debug=True)
         mwCluster=pw.getMwCluster(prefix="pw", port=9142)
