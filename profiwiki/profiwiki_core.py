@@ -5,6 +5,7 @@ Created on 2023-04-01
 '''
 import platform
 import os
+import secrets
 from mwdocker.mwcluster import MediaWikiCluster
 from profiwiki.docker import ProfiWikiContainer
 
@@ -45,6 +46,8 @@ class ProfiWiki():
         work as instructed by the arguments
         """
         mwCluster=self.getMwCluster(self.args.prefix,self.args.port)
+        if self.args.randompassword:
+
         if self.args.create:
             self.create(mwCluster, self.args.forcerebuild)
         if self.args.plantuml:
@@ -60,6 +63,18 @@ class ProfiWiki():
             pmw,pdb=self.getProfiWikiContainers(mwCluster)
             pmw.killremove()
             pdb.killremove()
+
+    def random_password(self,length:int = 13)->str:
+        """
+        create a random password
+
+        Args:
+            length(int): the length of the password
+
+        Returns:
+            str:a random password with the given length
+        """
+        return secrets.token_urlsafe(length))
         
     def getMwCluster(self,prefix,port): 
         """

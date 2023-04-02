@@ -38,6 +38,7 @@ class ProfiWikiCmd():
         parser.add_argument("-fa", "--fontawesome",   action="store_true", help="install fontawesome")
         parser.add_argument("-fr", "--forcerebuild",   action="store_true", help="force the rebuild")
         parser.add_argument("-kr", "--killremove",action="store_true", help="kill and remove my containers")
+        parser.add_argument("-rp", "--randompassword",   action="store_true", help="install plantuml")
         parser.add_argument("-pu", "--plantuml",   action="store_true", help="install plantuml")
         parser.add_argument("--port", type=int, default=9042, help="the port to serve from [default: %(default)s]")
         parser.add_argument("--prefix",default="pw",help="the container name prefix to use [default: %(default)s]")

@@ -56,4 +56,16 @@ class TestProfiWiki(Basetest):
         pmw,pdb=pw.getProfiWikiContainers(mwCluster)
         pmw.killremove()
         pdb.killremove()
+
+
+    def test_random_password(self):
+        """
+        test the random password generation
+        """
+        pw=ProfiWiki()
+        rp=pw.random_password(15)
+        debug=True
+        if debug:
+            print(rp)
+        self.assertEqual(15,len(pw))    
         
