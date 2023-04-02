@@ -75,7 +75,7 @@ class ProfiWiki():
         Returns:
             str:a random password with the given length
         """
-        return secrets.token_urlsafe(length))
+        return secrets.token_urlsafe(length)
         
     def getMwCluster(self,prefix,port): 
         """
