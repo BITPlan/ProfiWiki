@@ -24,6 +24,7 @@ class ProfiWiki():
         self.args=args
         self.debug=debug
         self.verbose=verbose
+        self.password=MediaWikiCluster.defaultPassword
         if args:
             self.debug=debug or self.args.debug
             if args.quiet:
@@ -47,7 +48,7 @@ class ProfiWiki():
         """
         mwCluster=self.getMwCluster(self.args.prefix,self.args.port)
         if self.args.randompassword:
-
+            self.password=self.random_password()
         if self.args.create:
             self.create(mwCluster, self.args.forcerebuild)
         if self.args.plantuml:
@@ -85,7 +86,6 @@ class ProfiWiki():
         self.port=port
         self.versions=[self.mw_version]
         self.user=MediaWikiCluster.defaultUser
-        self.password=MediaWikiCluster.defaultPassword
         self.extensionNameList=["Admin Links","Diagrams","Header Tabs","ImageMap","MagicNoCache","Maps9",
                                "Mermaid","MsUpload","Nuke","Page Forms","ParserFunctions","PDFEmbed","Renameuser",
                                "Replace Text","Semantic Result Formats","SyntaxHighlight","Variables"]
