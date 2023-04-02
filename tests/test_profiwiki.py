@@ -67,5 +67,5 @@ class TestProfiWiki(Basetest):
         debug=True
         if debug:
             print(rp)
-        self.assertEqual(15,len(pw))    
+        self.assertEqual(15,len(rp))    
         
