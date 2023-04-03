@@ -87,6 +87,7 @@ a2enconf font-awesome
         try:
             self.dc.container.execute(["service","apache2","restart"])
         except DockerException as e:
+            # we expect a SIGTERM
             if not e.return_code==143:
                 raise e
         pass
