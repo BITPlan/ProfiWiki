@@ -46,9 +46,15 @@ class ProfiWiki():
         """
         work as instructed by the arguments
         """
-        mwCluster=self.getMwCluster(self.args.prefix,self.args.port)
+        mwCluster=self.getMwCluster(self.args.prefix,port=self.args.port,sqlPort=self.args.sqlPort)
         if self.args.randompassword:
             self.password=self.random_password()
+        if self.args.all:
+            self.create(mwCluster, self.args.forcerebuild)
+            pmw,_pdb=self.getProfiWikiContainers(mwCluster)
+            pmw.install_fontawesome()
+            pmw.install_plantuml()
+            pmw.start_cron()
         if self.args.create:
             self.create(mwCluster, self.args.forcerebuild)
         if self.args.plantuml:
@@ -77,13 +83,16 @@ class ProfiWiki():
         """
         return secrets.token_urlsafe(length)
         
-    def getMwCluster(self,prefix,port): 
+    def getMwCluster(self,prefix,port,sqlPort:int=None): 
         """
         get the mediawiki cluster
         """   
         self.mw_version="1.39.2"
         self.prefix=prefix
         self.port=port
+        if sqlPort is None:
+            sqlPort=port+264 # 9306 for default 9042 port
+        self.sqlPort=sqlPort
         self.versions=[self.mw_version]
         self.user=MediaWikiCluster.defaultUser
         self.extensionNameList=["Admin Links","Diagrams","Header Tabs","ImageMap","MagicNoCache","Maps9",
@@ -100,17 +109,22 @@ class ProfiWiki():
             if self.debug:
                 print(f"""modified PATH from {os_path} to \n{os.environ["PATH"]}""")
             print(f"ProfiWiki {prefix} using port {port}")
+            
         mwCluster=MediaWikiCluster(versions=self.versions,
             user=self.user,
             password=self.password,
             container_name=self.container_name,
             extensionNameList=self.extensionNameList,
             basePort=self.port,
+            sqlPort=self.sqlPort,
             smwVersion=self.smwVersion)
         mwCluster.createApps()
         return mwCluster
     
     def getProfiWikiContainers(self,mwCluster):
+        """
+        get the two containers - for mediawiki and the database
+        """
         mwApp=mwCluster.apps[self.mw_version]
         mw,db=mwApp.getContainers()
         pmw=ProfiWikiContainer(mw)

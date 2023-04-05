@@ -31,7 +31,8 @@ class ProfiWikiCmd():
         """
         #script_path=Path(__file__)
         parser = ArgumentParser(description=description, formatter_class=RawDescriptionHelpFormatter)
-        parser.add_argument("-a", "--about", help="show about info [default: %(default)s]", action="store_true")
+        parser.add_argument("--about", help="show about info [default: %(default)s]", action="store_true")
+        parser.add_argument("--all",help="do all necessary steps for a full setup",action="store_true")
         parser.add_argument("-c", "--create",action="store_true",help="create the wiki")  
         parser.add_argument("--cron",action="store_true",help="start cron service")
         parser.add_argument("-fa", "--fontawesome",   action="store_true", help="install fontawesome")
@@ -40,6 +41,7 @@ class ProfiWikiCmd():
         parser.add_argument("-rp", "--randompassword",   action="store_true", help="create random password ans store wikiuser")
         parser.add_argument("-pu", "--plantuml",   action="store_true", help="install plantuml")
         parser.add_argument("--port", type=int, default=9042, help="the port to serve from [default: %(default)s]")
+        parser.add_argument('-sp', '--sqlPort',dest='sqlPort',type=int,default=None,help="set mySql port 3306 to be exposed - port+264=9306 if not specified [default: %(default)s]")
         parser.add_argument("--prefix",default="pw",help="the container name prefix to use [default: %(default)s]")
         parser.add_argument('-q', '--quiet', help="not verbose [default: %(default)s]",action="store_true")
         parser.add_argument("-i", "--info", help="show system info", action="store_true")
