@@ -73,6 +73,7 @@ class ProfiWikiCmd():
 
             pydevd.settrace(args.debugServer, port=args.debugPort, stdoutToServer=True, stderrToServer=True)
             print("command line args are: %s" % str(sys.argv))
+            pass
     
 def main(argv=None):  # IGNORE:C0111
     """main program."""
