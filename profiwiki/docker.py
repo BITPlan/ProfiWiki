@@ -14,11 +14,17 @@ class ProfiWikiContainer():
     def __init__(self,dc:DockerContainer):
         """
         Args:
-            dc: the Docc
+            dc(DockerContainer): the to wrap
         """
         self.dc=dc
     
     def log_action(self,action:str):
+        """
+        log the given action
+        
+        Args:
+            action(str): the d
+        """
         print(f"{action} {self.dc.kind} {self.dc.name}",flush=True)
         
     def upload(self,text:str,path:str):
@@ -26,25 +32,28 @@ class ProfiWikiContainer():
         upload the given text to the given path
         """
         with tempfile.NamedTemporaryFile() as tmp:
-            self.log_action(f"uploading {tmp.name} to ")
+            self.log_action(f"uploading {tmp.name} as {path} to ")
             with open(tmp.name,"w") as text_file:
                 text_file.write(text)
             self.dc.container.copy_to(tmp.name,path)
         
         
-    def killremove(self):
+    def killremove(self,volumes:bool=True):
         """
         kill and remove me
+        
+        Args:
+            volumes(bool): if True remove anonymous volumes associated with the container, default=True (to avoid e.g. passwords to get remembered / stuck
         """
         if self.dc:
             self.log_action("killing and removing")
             self.dc.container.kill()
-            self.dc.container.remove()
+            self.dc.container.remove(volumes=volumes)
 
     def start_cron(self):
         """
         Starting periodic command scheduler: cron.
-        """        
+        """  
         self.dc.container.execute(["sh","-c","service","cron","start"],tty=True)
         
     def install_plantuml(self):
