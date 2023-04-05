@@ -3,10 +3,13 @@
 	<name>ProfiWiki</name>
 	<comment></comment>
 	<projects>
+		<project>py-3rdparty-mediawiki</project>
+		<project>pymediawikidocker</project>
+		<project>py-yprinciple-gen</project>
 	</projects>
 	<buildSpec>
 	</buildSpec>
-<natures>
+	<natures>
 		<nature>org.python.pydev.pythonNature</nature>
 	</natures>
 </projectDescription>

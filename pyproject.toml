@@ -48,6 +48,9 @@ Source = "https://github.com/BITPlan/ProfiWiki"
 [project.optional-dependencies]
 test = [
   "green",
+  "pydevd",
+  # https://pypi.python.org/pypi/ptvsd
+  "ptvsd"
 ]
 
 [tool.hatch.build.targets.wheel]
