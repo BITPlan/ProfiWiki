@@ -8,6 +8,7 @@ import os
 import secrets
 from mwdocker.mwcluster import MediaWikiCluster
 from profiwiki.docker import ProfiWikiContainer
+from wikibot3rd.wikiuser import WikiUser
 
 class ProfiWiki():
     """
@@ -25,6 +26,7 @@ class ProfiWiki():
         self.debug=debug
         self.verbose=verbose
         self.password=MediaWikiCluster.defaultPassword
+        self.wikiUser=None
         if args:
             self.debug=debug or self.args.debug
             if args.quiet:
@@ -49,7 +51,12 @@ class ProfiWiki():
         mwCluster=self.getMwCluster(self.args.prefix,port=self.args.port,sqlPort=self.args.sqlPort)
         if self.args.randompassword:
             self.password=self.random_password()
+            self.wikiUser=self.createOrModifyWikiUser(force_overwrite=self.args.forceuser)
+        if self.args.wikiuser and not self.wikiUser:
+            self.createOrModifyWikiUser(force_overwrite=self.args.forceuser)
         if self.args.all:
+            if not self.wikiUser:
+                self.wikiUser=self.createOrModifyWikiUser()
             self.create(mwCluster, self.args.forcerebuild)
             pmw,_pdb=self.getProfiWikiContainers(mwCluster)
             pmw.install_fontawesome()
@@ -70,6 +77,33 @@ class ProfiWiki():
             pmw,pdb=self.getProfiWikiContainers(mwCluster)
             pmw.killremove()
             pdb.killremove()
+            
+    def createOrModifyWikiUser(self,force_overwrite:bool=False)->WikiUser:
+        """
+        create or modify the WikiUser for this profiwiki
+        
+        Args:
+            force_overwrite(bool): if True overwrite the wikuser info
+        """
+        wikiUsers=WikiUser.getWikiUsers(lenient=True)
+        if self.wiki_id in wikiUsers and not force_overwrite:
+            wikiUser=wikiUsers[self.wiki_id]          
+            if self.password != wikiUser.getPassword():
+                raise Exception(f"wikiUser for wiki {self.wiki_id} already exists but with different password")
+            pass
+        else:
+            userDict = {
+                "wikiId": self.wiki_id, 
+                "email": "noreply@nouser.com", 
+                "url": "https://cr.bitplan.com",
+                "scriptPath": "", 
+                "version": f"MediaWiki {self.mw_version}",
+                "user": "Sysop",
+                "password": f"{self.password}"
+            }
+            wikiUser=WikiUser.ofDict(userDict,encrypted=False)
+            wikiUser.save()
+        return wikiUser
 
     def random_password(self,length:int = 13)->str:
         """
@@ -99,7 +133,8 @@ class ProfiWiki():
                                "Mermaid","MsUpload","Nuke","Page Forms","ParserFunctions","PDFEmbed","Renameuser",
                                "Replace Text","Semantic Result Formats","SyntaxHighlight","Variables"]
         self.smwVersion="4.1.0"
-        self.container_name=f"{prefix}-{port}"
+        self.wiki_id=f"{prefix}-{port}"
+        self.container_name=self.wiki_id
         if self.verbose:
             os_path=os.environ["PATH"]
             paths=["/usr/local/bin"]
