@@ -48,12 +48,12 @@ class ProfiWiki():
         """
         work as instructed by the arguments
         """
-        mwCluster=self.getMwCluster(self.args.prefix,port=self.args.port,sqlPort=self.args.sqlPort)
         if self.args.randompassword:
             self.password=self.random_password()
             self.wikiUser=self.createOrModifyWikiUser(force_overwrite=self.args.forceuser)
         if self.args.wikiuser and not self.wikiUser:
             self.createOrModifyWikiUser(force_overwrite=self.args.forceuser)
+        mwCluster=self.getMwCluster(self.args.prefix,port=self.args.port,sqlPort=self.args.sqlPort)
         if self.args.all:
             if not self.wikiUser:
                 self.wikiUser=self.createOrModifyWikiUser()
