@@ -135,6 +135,7 @@ class ProfiWiki():
         self.extensionNameList=["Admin Links","Diagrams","Header Tabs","ImageMap","MagicNoCache","Maps9",
                                "Mermaid","MsUpload","Nuke","Page Forms","ParserFunctions","PDFEmbed","Renameuser",
                                "Replace Text","Semantic Result Formats","SyntaxHighlight","Variables"]
+        self.wiki_id=f"{prefix}-{port}"
         self.container_name=self.wiki_id
         if self.verbose:
             os_path=os.environ["PATH"]
