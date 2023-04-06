@@ -19,6 +19,9 @@ class ProfiWiki():
         """
         constructor
         """
+        self.mw_version="1.39.3"
+        self.smwVersion="4.1.0"
+        
         self.os_name=platform.system()
         self.os_uname=os.uname()
         self.os_release=platform.release()
@@ -122,7 +125,6 @@ class ProfiWiki():
         """
         get the mediawiki cluster
         """   
-        self.mw_version="1.39.3"
         self.prefix=prefix
         self.port=port
         if sqlPort is None:
@@ -133,7 +135,6 @@ class ProfiWiki():
         self.extensionNameList=["Admin Links","Diagrams","Header Tabs","ImageMap","MagicNoCache","Maps9",
                                "Mermaid","MsUpload","Nuke","Page Forms","ParserFunctions","PDFEmbed","Renameuser",
                                "Replace Text","Semantic Result Formats","SyntaxHighlight","Variables"]
-        self.smwVersion="4.1.0"
         self.container_name=self.wiki_id
         if self.verbose:
             os_path=os.environ["PATH"]
