@@ -48,6 +48,7 @@ class ProfiWiki():
         """
         work as instructed by the arguments
         """
+        self.wiki_id=f"{self.args.prefix}-{self.args.port}"
         if self.args.randompassword:
             self.password=self.random_password()
             self.wikiUser=self.createOrModifyWikiUser(force_overwrite=self.args.forceuser)
@@ -133,7 +134,6 @@ class ProfiWiki():
                                "Mermaid","MsUpload","Nuke","Page Forms","ParserFunctions","PDFEmbed","Renameuser",
                                "Replace Text","Semantic Result Formats","SyntaxHighlight","Variables"]
         self.smwVersion="4.1.0"
-        self.wiki_id=f"{prefix}-{port}"
         self.container_name=self.wiki_id
         if self.verbose:
             os_path=os.environ["PATH"]
