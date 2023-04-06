@@ -87,7 +87,7 @@ class ProfiWiki():
         """
         get the mediawiki cluster
         """   
-        self.mw_version="1.39.2"
+        self.mw_version="1.39.3"
         self.prefix=prefix
         self.port=port
         if sqlPort is None:
