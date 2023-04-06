@@ -153,6 +153,7 @@ class ProfiWiki():
             basePort=self.port,
             sqlPort=self.sqlPort,
             smwVersion=self.smwVersion)
+        # generate
         mwCluster.createApps()
         return mwCluster
     
