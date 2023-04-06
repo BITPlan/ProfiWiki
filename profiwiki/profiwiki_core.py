@@ -52,6 +52,9 @@ class ProfiWiki():
         work as instructed by the arguments
         """
         self.wiki_id=f"{self.args.prefix}-{self.args.port}"
+        if self.args.bash:
+            cmd=f"docker exec -it pw-9042-mw /bin/bash"
+            print(cmd)
         if self.args.randompassword:
             self.password=self.random_password()
             self.wikiUser=self.createOrModifyWikiUser(force_overwrite=self.args.forceuser)
