@@ -3,6 +3,7 @@ Created on 2023-04-01
 
 @author: wf
 '''
+import json
 import platform
 import os
 from mwdocker.mwcluster import MediaWikiCluster
@@ -66,57 +67,52 @@ class ProfiWiki():
             cmd=f"docker exec -it {self.config.container_base_name}-mw /bin/bash"
             print(cmd)
             return
+        mwApp=self.getMwApp(withGenerate=args.forceRebuild)
         if args.randompassword:
-            self.password=self.random_password()
-            self.wikiUser=self.createOrModifyWikiUser(force_overwrite=args.forceuser)
+            self.password=self.config.random_password()
+            self.wikiUser=self.createOrModifyWikiUser(mwApp,force_overwrite=args.forceuser)
         if args.wikiuser and not self.wikiUser:
-            self.createOrModifyWikiUser(force_overwrite=args.forceuser)
-        mwCluster=self.getMwCluster(withGenerate=args.forcerebuild)
+            self.createOrModifyWikiUser(mwApp,force_overwrite=args.forceuser)
         if args.all:
             if not self.wikiUser:
-                self.wikiUser=self.createOrModifyWikiUser()
-            self.create(mwCluster, args.forcerebuild)
-            pmw,_pdb=self.getProfiWikiContainers(mwCluster)
+                self.wikiUser=self.createOrModifyWikiUser(mwApp,force_overwrite=args.forceuser)
+            self.create(mwApp, args.forceRebuild)
+            pmw,_pdb=self.getProfiWikiContainers(mwApp)
             pmw.install_fontawesome()
             pmw.install_plantuml()
             pmw.start_cron()
         if args.create:
-            self.create(mwCluster, args.forcerebuild)
+            self.create(mwApp, args.forceRebuild)
+        if args.down:
+            self.down(mwApp,args.forceRebuild)
+        if args.list:
+            self.list(mwApp)
         if args.plantuml:
-            pmw,_pdb=self.getProfiWikiContainers(mwCluster)
+            pmw,_pdb=self.getProfiWikiContainers(mwApp)
             pmw.install_plantuml()
         if args.fontawesome:
-            pmw,_pdb=self.getProfiWikiContainers(mwCluster)
+            pmw,_pdb=self.getProfiWikiContainers(mwApp)
             pmw.install_fontawesome()
         if args.cron:
-            pmw,_pdb=self.getProfiWikiContainers(mwCluster)
+            pmw,_pdb=self.getProfiWikiContainers(mwApp)
             pmw.start_cron()
             
-    def createOrModifyWikiUser(self,force_overwrite:bool=False)->WikiUser:
+    def createOrModifyWikiUser(self,mwApp,force_overwrite:bool=False)->WikiUser:
         """
         create or modify the WikiUser for this profiwiki
         
         Args:
+            mwApp(DockerApplication): the mediawiki docker application
             force_overwrite(bool): if True overwrite the wikuser info
         """
         wikiUsers=WikiUser.getWikiUsers(lenient=True)
         if self.wiki_id in wikiUsers and not force_overwrite:
             wikiUser=wikiUsers[self.wiki_id]          
-            if self.password != wikiUser.getPassword():
+            if self.config.password != wikiUser.getPassword():
                 raise Exception(f"wikiUser for wiki {self.wiki_id} already exists but with different password")
             pass
         else:
-            userDict = {
-                "wikiId": self.wiki_id, 
-                "email": "noreply@nouser.com", 
-                "url": "",
-                "scriptPath": "", 
-                "version": f"MediaWiki {self.mw_version}",
-                "user": "Sysop",
-                "password": f"{self.password}"
-            }
-            wikiUser=WikiUser.ofDict(userDict,encrypted=False)
-            wikiUser.save()
+            wikiUser=mwApp.createWikiUser(self.wiki_id,store=True)
         return wikiUser
     
     def getMwCluster(self,withGenerate:bool=True)->MediaWikiCluster:
@@ -162,14 +158,27 @@ class ProfiWiki():
         pdb=ProfiWikiContainer(db)
         return pmw,pdb
         
-    def check(self,mwCluster):
+    def check(self,mwApp):
         """
         check
         """
-        mwCluster.check()
+        mwApp.check()
             
-    def create(self,mwCluster,forceRebuild:bool=False):
+    def create(self,mwApp,forceRebuild:bool=False):
         """
-        create a mediawiki
+        create a profiwiki mediawiki
         """
-        mwCluster.start(forceRebuild=forceRebuild)
+        mwApp.start(forceRebuild=forceRebuild)
+        
+    def down(self,mwApp,forceRebuild:bool=False):
+        """
+        shut down the profiwiki base mediawiki
+        """
+        mwApp.down(forceRebuild=forceRebuild)
+        
+    def list(self,mwApp):
+        """
+        list the profi wikis
+        """
+        print (json.dumps(mwApp.config.as_dict(),indent=2))
+        pass
