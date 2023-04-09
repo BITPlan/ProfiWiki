@@ -16,7 +16,7 @@ class ProfiWiki():
     ProfiWiki
     """
     
-    def __init__(self,prefix:str="pwt",smw_version="4.1.1",mw_version="1.39.3",port:int=9079):
+    def __init__(self,prefix:str="pw",smw_version="4.1.1",mw_version="1.39.3",port:int=9079):
         """
         constructor
         """        
@@ -60,40 +60,37 @@ class ProfiWiki():
         Args:
             args(Namespace): the command line arguments
         """
-        self.config.fromArgs(self.args)
-        self.wiki_id=f"{self.args.prefix}-{self.args.port}"
-        if self.args.bash:
-            cmd=f"docker exec -it pw-9042-mw /bin/bash"
+        self.config.fromArgs(args)
+        self.wiki_id=f"{self.config.container_base_name}"
+        if args.bash:
+            cmd=f"docker exec -it {self.config.container_base_name}-mw /bin/bash"
             print(cmd)
-        if self.args.randompassword:
+            return
+        if args.randompassword:
             self.password=self.random_password()
-            self.wikiUser=self.createOrModifyWikiUser(force_overwrite=self.args.forceuser)
-        if self.args.wikiuser and not self.wikiUser:
-            self.createOrModifyWikiUser(force_overwrite=self.args.forceuser)
-        mwCluster=self.getMwCluster(self.args)
-        if self.args.all:
+            self.wikiUser=self.createOrModifyWikiUser(force_overwrite=args.forceuser)
+        if args.wikiuser and not self.wikiUser:
+            self.createOrModifyWikiUser(force_overwrite=args.forceuser)
+        mwCluster=self.getMwCluster(withGenerate=args.forcerebuild)
+        if args.all:
             if not self.wikiUser:
                 self.wikiUser=self.createOrModifyWikiUser()
-            self.create(mwCluster, self.args.forcerebuild)
+            self.create(mwCluster, args.forcerebuild)
             pmw,_pdb=self.getProfiWikiContainers(mwCluster)
             pmw.install_fontawesome()
             pmw.install_plantuml()
             pmw.start_cron()
-        if self.args.create:
-            self.create(mwCluster, self.args.forcerebuild)
-        if self.args.plantuml:
+        if args.create:
+            self.create(mwCluster, args.forcerebuild)
+        if args.plantuml:
             pmw,_pdb=self.getProfiWikiContainers(mwCluster)
             pmw.install_plantuml()
-        if self.args.fontawesome:
+        if args.fontawesome:
             pmw,_pdb=self.getProfiWikiContainers(mwCluster)
             pmw.install_fontawesome()
-        if self.args.cron:
+        if args.cron:
             pmw,_pdb=self.getProfiWikiContainers(mwCluster)
             pmw.start_cron()
-        if self.args.killremove:
-            pmw,pdb=self.getProfiWikiContainers(mwCluster)
-            pmw.killremove()
-            pdb.killremove()
             
     def createOrModifyWikiUser(self,force_overwrite:bool=False)->WikiUser:
         """
