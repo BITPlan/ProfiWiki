@@ -37,7 +37,6 @@ class ProfiWikiContainer():
                 text_file.write(text)
             self.dc.container.copy_to(tmp.name,path)
         
-        
     def killremove(self,volumes:bool=False):
         """
         kill and remove me

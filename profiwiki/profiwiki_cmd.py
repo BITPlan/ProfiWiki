@@ -39,6 +39,7 @@ class ProfiWikiCmd():
         parser.add_argument("--create",action="store_true",help="create the wiki")  
         parser.add_argument("--cron",action="store_true",help="start cron service")        
         parser.add_argument("--down", action="store_true", help="shutdown the wiki [default: %(default)s]")
+        parser.add_argument("--patch", action="store_true", help="apply LocalSettings.php patches [default: %(default)s]")
         parser.add_argument("--list",action="store_true",help="list the available profi wikis [default: %(default)s]")
         parser.add_argument("-fu","--forceuser",action="store_true",help="force overwrite of wikiuser")
         parser.add_argument("-fa", "--fontawesome",   action="store_true", help="install fontawesome")

@@ -3,7 +3,9 @@ Created on 2023-04-01
 
 @author: wf
 '''
+import datetime
 import json
+import tempfile
 import platform
 import os
 from mwdocker.mwcluster import MediaWikiCluster
@@ -11,6 +13,7 @@ from mwdocker.docker import DockerApplication
 from profiwiki.docker import ProfiWikiContainer
 from wikibot3rd.wikiuser import WikiUser
 from mwdocker.config import MwClusterConfig
+from profiwiki.patch import Patch
 
 class ProfiWiki():
     """
@@ -80,6 +83,7 @@ class ProfiWiki():
             pmw,_pdb=self.getProfiWikiContainers(mwApp)
             pmw.install_fontawesome()
             pmw.install_plantuml()
+            #self.patch(pmw)
             pmw.start_cron()
         if args.create:
             self.create(mwApp, args.forceRebuild)
@@ -87,15 +91,16 @@ class ProfiWiki():
             self.down(mwApp,args.forceRebuild)
         if args.list:
             self.list(mwApp)
-        if args.plantuml:
+        if args.plantuml or args.fontawesome or args.cron or args.patch:
             pmw,_pdb=self.getProfiWikiContainers(mwApp)
-            pmw.install_plantuml()
-        if args.fontawesome:
-            pmw,_pdb=self.getProfiWikiContainers(mwApp)
-            pmw.install_fontawesome()
-        if args.cron:
-            pmw,_pdb=self.getProfiWikiContainers(mwApp)
-            pmw.start_cron()
+            if args.plantuml:
+                pmw.install_plantuml()
+            if args.fontawesome:
+                pmw.install_fontawesome()
+            if args.cron:
+                pmw.start_cron()
+            if args.patch:
+                self.patch(pmw)
             
     def createOrModifyWikiUser(self,mwApp,force_overwrite:bool=False)->WikiUser:
         """
@@ -157,6 +162,24 @@ class ProfiWiki():
         pmw=ProfiWikiContainer(mw)
         pdb=ProfiWikiContainer(db)
         return pmw,pdb
+    
+    def patch(self,pwc:ProfiWikiContainer):
+        """
+        apply profi wiki patches to the given ProfiWikiContainer
+        """
+        ls_path="/var/www/html/LocalSettings.php"
+        timestamp=datetime.datetime.utcnow().strftime('%Y-%m-%d')
+        with tempfile.NamedTemporaryFile(mode='w', prefix='LocalSettings_', suffix='.php') as ls_file:
+            pwc.log_action(f"patching {ls_file.name}")
+            pwc.dc.container.copy_from(ls_path,ls_file.name)
+            patch=Patch(file_path=ls_file.name)
+            lines=f"""// modified by profiwiki  
+$wgRawHtml = true;
+$wgAllowImageTag=true;
+"""
+            patch.add_text(lines)
+            patch.save()
+            pwc.dc.container.copy_to(ls_file.name,ls_path)
         
     def check(self,mwApp):
         """
