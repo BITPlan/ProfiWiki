@@ -5,35 +5,40 @@ Created on 2023-04-01
 '''
 import platform
 import os
-import secrets
 from mwdocker.mwcluster import MediaWikiCluster
+from mwdocker.docker import DockerApplication
 from profiwiki.docker import ProfiWikiContainer
 from wikibot3rd.wikiuser import WikiUser
+from mwdocker.config import MwClusterConfig
 
 class ProfiWiki():
     """
     ProfiWiki
     """
     
-    def __init__(self,args=None,verbose:bool=True,debug:bool=False):
+    def __init__(self,prefix:str="pwt",smw_version="4.1.1",mw_version="1.39.3",port:int=9079):
         """
         constructor
-        """
-        self.mw_version="1.39.3"
-        self.smwVersion="4.1.0"
-        
+        """        
         self.os_name=platform.system()
         self.os_uname=os.uname()
         self.os_release=platform.release()
-        self.args=args
-        self.debug=debug
-        self.verbose=verbose
-        self.password=MediaWikiCluster.defaultPassword
+        self.args=None
         self.wikiUser=None
-        if args:
-            self.debug=debug or self.args.debug
-            if args.quiet:
-                self.verbose=False
+        self.config=MwClusterConfig()
+        self.config.smwVersion=smw_version
+        self.config.prefix=prefix
+        self.config.basePort=port
+        self.config.sqlPort=port-1
+        self.config.port=port
+        self.config.versions=[mw_version]
+        self.config.container_base_name="pw"
+        self.config.extensionNameList=["Admin Links","Diagrams","Header Tabs","ImageMap","MagicNoCache","Maps9",
+                               "Mermaid","MsUpload","Nuke","Page Forms","ParserFunctions","PDFEmbed","Renameuser",
+                               "Replace Text","Semantic Result Formats","SyntaxHighlight","Variables"]
+        self.config.__post_init__()
+        self.mwCluster=None
+        pass
         
     def system_info(self)->str:
         """
@@ -47,10 +52,14 @@ class ProfiWiki():
             info+=f"{self.os_release}"
         return info
     
-    def work(self):
+    def work(self,args):
         """
         work as instructed by the arguments
+        
+        Args:
+            args(Namespace): the command line arguments
         """
+        self.config.fromArgs(self.args)
         self.wiki_id=f"{self.args.prefix}-{self.args.port}"
         if self.args.bash:
             cmd=f"docker exec -it pw-9042-mw /bin/bash"
@@ -60,7 +69,7 @@ class ProfiWiki():
             self.wikiUser=self.createOrModifyWikiUser(force_overwrite=self.args.forceuser)
         if self.args.wikiuser and not self.wikiUser:
             self.createOrModifyWikiUser(force_overwrite=self.args.forceuser)
-        mwCluster=self.getMwCluster(self.args.prefix,port=self.args.port,sqlPort=self.args.sqlPort)
+        mwCluster=self.getMwCluster(self.args)
         if self.args.all:
             if not self.wikiUser:
                 self.wikiUser=self.createOrModifyWikiUser()
@@ -102,7 +111,7 @@ class ProfiWiki():
             userDict = {
                 "wikiId": self.wiki_id, 
                 "email": "noreply@nouser.com", 
-                "url": "https://cr.bitplan.com",
+                "url": "",
                 "scriptPath": "", 
                 "version": f"MediaWiki {self.mw_version}",
                 "user": "Sysop",
@@ -111,62 +120,45 @@ class ProfiWiki():
             wikiUser=WikiUser.ofDict(userDict,encrypted=False)
             wikiUser.save()
         return wikiUser
-
-    def random_password(self,length:int = 13)->str:
+    
+    def getMwCluster(self,withGenerate:bool=True)->MediaWikiCluster:
         """
-        create a random password
-
-        Args:
-            length(int): the length of the password
-
-        Returns:
-            str:a random password with the given length
-        """
-        return secrets.token_urlsafe(length)
+        get a mediawiki Cluster for my configuration
         
-    def getMwCluster(self,prefix,port,sqlPort:int=None): 
-        """
-        get the mediawiki cluster
-        """   
-        self.prefix=prefix
-        self.port=port
-        if sqlPort is None:
-            sqlPort=port+264 # 9306 for default 9042 port
-        self.sqlPort=sqlPort
-        self.versions=[self.mw_version]
-        self.user=MediaWikiCluster.defaultUser
-        self.extensionNameList=["Admin Links","Diagrams","Header Tabs","ImageMap","MagicNoCache","Maps9",
-                               "Mermaid","MsUpload","Nuke","Page Forms","ParserFunctions","PDFEmbed","Renameuser",
-                               "Replace Text","Semantic Result Formats","SyntaxHighlight","Variables"]
-        self.wiki_id=f"{prefix}-{port}"
-        self.container_name=self.wiki_id
-        if self.verbose:
-            os_path=os.environ["PATH"]
-            paths=["/usr/local/bin"]
-            for path in paths:
-                if not path in os_path:
-                    os.environ["PATH"]=f"{os_path}{os.pathsep}{path}"
-            if self.debug:
-                print(f"""modified PATH from {os_path} to \n{os.environ["PATH"]}""")
-            print(f"ProfiWiki {prefix} using port {port}")
+        Args:
+            withGenerate(bool): if True regenerate the configuration files
             
-        mwCluster=MediaWikiCluster(versions=self.versions,
-            user=self.user,
-            password=self.password,
-            container_name=self.container_name,
-            extensionNameList=self.extensionNameList,
-            basePort=self.port,
-            sqlPort=self.sqlPort,
-            smwVersion=self.smwVersion)
+        Returns:
+            MediaWikiCluster: the MediaWiki Cluser
+        """
+        if self.mwCluster is not None:
+            return self.mwCluster
+        if self.config.verbose:
+            print(f"ProfiWiki {self.config.prefix} using port {self.config.port}")
+        mwCluster=MediaWikiCluster(config=self.config)
         # generate
-        mwCluster.createApps()
+        mwCluster.createApps(withGenerate=withGenerate)
+        self.mwCluster=mwCluster
         return mwCluster
     
-    def getProfiWikiContainers(self,mwCluster):
+    def getMwApp(self,withGenerate:bool=True): 
+        """
+        get my mediawiki Docker application 
+        """   
+        mwCluster=self.getMwCluster(withGenerate)
+        mwApp=mwCluster.apps[self.config.version]
+        return mwApp
+    
+    def getProfiWikiContainers(self,mwApp:DockerApplication):
         """
         get the two containers - for mediawiki and the database
+        
+        Args:
+            mwApp(DockerApplication): the MediaWiki Docker Application
+            
+        Returns:
+            Tuple(ProfiWikiContainer,ProfiWikiContainer): MediaWiki, Database
         """
-        mwApp=mwCluster.apps[self.mw_version]
         mw,db=mwApp.getContainers()
         pmw=ProfiWikiContainer(mw)
         pdb=ProfiWikiContainer(db)
@@ -183,5 +175,3 @@ class ProfiWiki():
         create a mediawiki
         """
         mwCluster.start(forceRebuild=forceRebuild)
-        
-    

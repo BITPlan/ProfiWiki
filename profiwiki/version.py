@@ -7,13 +7,13 @@ import profiwiki
 
 class Version(object):
     '''
-    Version handling for pysotsog
+    Version handling for ProfiWiki
     '''
     name="pyProfiWiki"
     description="""BITPlan's professional Semantic Mediawiki"""
     version=profiwiki.__version__
     date = '2023-04-01'
-    updated = '2023-04-05'
+    updated = '2023-04-08'
     authors='Wolfgang Fahl'
     doc_url="https://wiki.bitplan.com/index.php/ProfiWiki"
     chat_url="https://github.com/BITPlan/ProfiWiki/discussions"
