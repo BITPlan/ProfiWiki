@@ -173,9 +173,15 @@ class ProfiWiki():
             pwc.log_action(f"patching {ls_file.name}")
             pwc.dc.container.copy_from(ls_path,ls_file.name)
             patch=Patch(file_path=ls_file.name)
-            lines=f"""// modified by profiwiki  
+            lines=f"""// modified by profiwiki 
+// allow raw HTML 
 $wgRawHtml = true;
+// allow images
 $wgAllowImageTag=true;
+// InstantCommons allows wiki to use images from https://commons.wikimedia.org
+$wgUseInstantCommons = true;
+// avoid showing (expected) deprecation warnings
+error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
 """
             patch.add_text(lines)
             patch.save()
