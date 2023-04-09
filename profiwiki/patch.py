@@ -16,16 +16,20 @@ class Patch:
         Args:
             file_path (str): The file path of the PHP file to be patched.
         """
+        self.lines=[]
         self.file_path = file_path
-        with open(self.file_path, 'r') as f:
-            self.lines = f.readlines()
+        # https://stackoverflow.com/a/3277516/1497139
+        with open(self.file_path, 'r', encoding='UTF-8') as file:
+            while line := file.readline():
+                self.lines.append(line.rstrip())
             
     def save(self):
         """
         save my lines
         """
         with open(self.file_path, 'w') as f:
-            f.writelines(self.lines)
+            for line in self.lines:
+                f.write(f"{line}\n")
         
     def patch_mediawiki_config_var(self, var_name: str, var_value: str) -> None:
         """

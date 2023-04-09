@@ -83,7 +83,7 @@ class ProfiWiki():
             pmw,_pdb=self.getProfiWikiContainers(mwApp)
             pmw.install_fontawesome()
             pmw.install_plantuml()
-            #self.patch(pmw)
+            self.patch(pmw)
             pmw.start_cron()
         if args.create:
             self.create(mwApp, args.forceRebuild)

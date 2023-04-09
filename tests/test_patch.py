@@ -62,7 +62,6 @@ $wgAllowImageTag=true;"""
         patch.save() 
         patch2=Patch(patch.file_path)
         self.assertEqual(6,len(patch2.lines))
-         
 
     def test_patch_mediawiki_config_var(self):
         # Test patching a configuration variable that exists in the file
