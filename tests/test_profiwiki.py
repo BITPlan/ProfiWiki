@@ -33,7 +33,7 @@ class TestProfiWiki(Basetest):
         debug=self.debug
         if debug:
             print(json.dumps(config_dict,indent=2))
-        self.assertEqual("pwt",self.pw.config.prefix)
+        self.assertEqual("pwt1",self.pw.config.prefix)
         
     def getProfiWiki(self,argv=[]):
         """
