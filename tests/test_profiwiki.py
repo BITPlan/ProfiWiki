@@ -95,6 +95,7 @@ class TestProfiWiki(Basetest):
         """
         mwApp=self.getMwApp(forceRebuild=False)
         ls_path=f"{mwApp.dockerPath}/Localsettings.php"
+        print (f"checking {ls_path} to exist for {mwApp.config.as_dict()}")
         self.assertTrue(os.path.isfile(ls_path))
         with open(ls_path) as ls_file:
             ls_text= ls_file.read()
