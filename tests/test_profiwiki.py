@@ -46,11 +46,13 @@ class TestProfiWiki(Basetest):
         pw.config.fromArgs(args)
         return pw
     
-    def getMwApp(self,forceRebuild:bool=False):
+    def getMwApp(self,argv=None,forceRebuild:bool=False):
         """
         get the mediaWikiApp
         """
-        self.pw=self.getProfiWiki(self.argv)
+        if argv is None:
+            argv=self.argv
+        self.pw=self.getProfiWiki(argv)
         self.pw.config.forceRebuild=forceRebuild
         mwApp=self.pw.getMwApp(withGenerate=forceRebuild)
         return mwApp
@@ -93,7 +95,8 @@ class TestProfiWiki(Basetest):
         """
         test the logo
         """
-        mwApp=self.getMwApp(forceRebuild=False)
+        argv=["--prefix","logotest","--basePort","11001","--sqlBasePort","11002"]
+        mwApp=self.getMwApp(argv=argv,forceRebuild=True)
         ls_path=f"{mwApp.dockerPath}/Localsettings.php"
         print (f"checking {ls_path} to exist for {mwApp.config.as_dict()}")
         self.assertTrue(os.path.isfile(ls_path))
