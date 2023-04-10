@@ -190,6 +190,7 @@ $wgUFEnabledPersonalDataFunctions = [
     'useremail',
     'username',
 ];
+// work around last line not copied
 """
             patch.add_text(lines)
             patch.save()
