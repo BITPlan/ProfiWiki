@@ -39,7 +39,7 @@ class ProfiWiki():
         self.config.container_base_name="pw"
         self.config.extensionNameList=["Admin Links","Diagrams","Header Tabs","ImageMap","MagicNoCache","Maps9",
                                "Mermaid","MsUpload","Nuke","Page Forms","ParserFunctions","PDFEmbed","Renameuser",
-                               "Replace Text","Semantic Result Formats","SyntaxHighlight","Variables"]
+                               "Replace Text","Semantic Result Formats","SyntaxHighlight","Variables","UserFunctions"]
         self.config.logo="https://wiki.bitplan.com/images/wiki/thumb/6/63/Profiwikiicon.png/96px-Profiwikiicon.png"
         self.config.__post_init__()
         self.mwCluster=None
@@ -182,6 +182,14 @@ $wgAllowImageTag=true;
 $wgUseInstantCommons = true;
 // avoid showing (expected) deprecation warnings
 error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
+// https://www.mediawiki.org/wiki/Extension:UserFunctions
+$wgUFEnabledPersonalDataFunctions = [
+    'ip',
+    'nickname',
+    'realname',
+    'useremail',
+    'username',
+];
 """
             patch.add_text(lines)
             patch.save()
