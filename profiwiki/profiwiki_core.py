@@ -87,6 +87,8 @@ class ProfiWiki():
             pmw.start_cron()
         if args.create:
             self.create(mwApp, args.forceRebuild)
+        if args.check:
+            self.check(mwApp)
         if args.down:
             self.down(mwApp,args.forceRebuild)
         if args.list:
