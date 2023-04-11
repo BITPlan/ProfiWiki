@@ -5,8 +5,6 @@ Created on 2023-04-09
 '''
 from tests.basetest import Basetest
 from profiwiki.patch import Patch
-import os
-import shutil
 import tempfile
 
 class TestPatch(Basetest):
@@ -17,28 +15,30 @@ class TestPatch(Basetest):
     def setUp(self, debug=False, profile=True):
         Basetest.setUp(self, debug=debug, profile=profile)
         
+    def getTestfile(self):
+        tmp=tempfile.NamedTemporaryFile(prefix="test",suffix=".php")
+        return tmp.name
+        
     def getPatch(self):
         # Create a temporary directory and a test PHP file with example variables
-        self.temp_dir = tempfile.mkdtemp()
-        self.test_file_path = os.path.join(self.temp_dir, "test.php")
-        with open(self.test_file_path, "w") as f:
+        test_file_path=self.getTestfile()
+        with open(test_file_path, "w") as f:
             f.write("<?php\n\n")
             f.write("$wgSitename = 'MyWiki';\n")
             f.write("$wgLanguageCode = 'en';\n")
             f.write("$wgEnableEmail = true;\n")
 
-        patch = Patch(self.test_file_path)
+        patch = Patch(test_file_path)
         return patch
     
     def checkPatch(self,patch,expected_content):
+        """
+        check the patch against the expected content
+        """
         with open(patch.file_path) as f:
             contents = f.read()
             self.assertIn(expected_content, contents)
-
-    def tearDown(self):
-        # Remove the temporary directory and its contents
-        shutil.rmtree(self.temp_dir)
-        
+            
     def test_add(self):
         """
         test adding  lines
@@ -52,6 +52,34 @@ $wgAllowImageTag=true;"""
         patch.add_text(lines)
         self.assertEqual(7,len(patch.lines))
         
+    def test_quirk(self):
+        lines="""
+        // modified by profiwiki 
+// allow raw HTML 
+$wgRawHtml = true;
+// allow images
+$wgAllowImageTag=true;
+// InstantCommons allows wiki to use images from https://commons.wikimedia.org
+$wgUseInstantCommons = true;
+// avoid showing (expected) deprecation warnings
+error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
+// https://www.mediawiki.org/wiki/Extension:UserFunctions
+$wgUFEnabledPersonalDataFunctions = [
+    'ip',
+    'nickname',
+    'realname',
+    'useremail',
+    'username',
+];
+// work around last line not copied
+        """
+        patch=self.getPatch()
+        patch.add_text(lines)
+        patch.file_path=self.getTestfile()
+        patch.save()
+        patch2=Patch(patch.file_path)
+        print (patch2.lines)
+        
     def test_save(self):
         """
         test saving after having added a line
@@ -64,6 +92,9 @@ $wgAllowImageTag=true;"""
         self.assertEqual(6,len(patch2.lines))
 
     def test_patch_mediawiki_config_var(self):
+        """
+        test patching a mediawiki configuration
+        """
         # Test patching a configuration variable that exists in the file
         patch=self.getPatch()
         patch.patch_mediawiki_config_var("Sitename", "'NewWikiName'")
