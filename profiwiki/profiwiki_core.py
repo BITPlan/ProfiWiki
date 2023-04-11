@@ -169,6 +169,8 @@ class ProfiWiki():
         """
         apply profi wiki patches to the given ProfiWikiContainer
         """
+        if not pwc.dc:
+            raise("no container to apply patch")
         ls_path="/var/www/html/LocalSettings.php"
         timestamp=datetime.datetime.utcnow().strftime('%Y-%m-%d')
         with tempfile.NamedTemporaryFile(mode='w', prefix='LocalSettings_', suffix='.php') as ls_file:
@@ -185,15 +187,7 @@ $wgUseInstantCommons = true;
 // avoid showing (expected) deprecation warnings
 error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
 // https://www.mediawiki.org/wiki/Extension:UserFunctions
-$wgUFEnabledPersonalDataFunctions = [
-    'ip',
-    'nickname',
-    'realname',
-    'useremail',
-    'username',
-];
-// what's up here?
-// work around last line not copied
+$wgUFEnabledPersonalDataFunctions = ['ip','nickname','realname','useremail','username',];
 """
             patch.add_text(lines)
             patch.save()

@@ -25,7 +25,10 @@ class ProfiWikiContainer():
         Args:
             action(str): the d
         """
-        print(f"{action} {self.dc.kind} {self.dc.name}",flush=True)
+        if self.dc:
+            print(f"{action} {self.dc.kind} {self.dc.name}",flush=True)
+        else:
+            print(f"{action}",flush=True)
         
     def upload(self,text:str,path:str):
         """
@@ -53,7 +56,7 @@ class ProfiWikiContainer():
         """
         Starting periodic command scheduler: cron.
         """  
-        self.dc.container.execute(["sh","-c","service","cron","start"],tty=True)
+        self.dc.container.execute(["/usr/sbin/service","cron","start"],tty=True)
         
     def install_plantuml(self):
         """

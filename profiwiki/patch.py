@@ -53,14 +53,18 @@ class Patch:
             new_line=(re.sub(pattern, replacement, line))
             self.lines[i]=new_line
                 
-    def add_text(self,text:str):
+    def add_text(self,text:str,avoid_duplication:bool=True):
         """
-        Adds text avoiding duplication
+        Adds text avoiding duplication if specified
 
         Args:
             text (str): the text to add
+            avoid_duplication(bool): if True avoid duplication of existing lines
         """
         new_lines=text.split("\n")
         for new_line in new_lines:
-            if not new_line in self.lines:
+            do_add=True
+            if avoid_duplication:
+                do_add=not new_line in self.lines
+            if do_add:
                 self.lines.append(new_line)
