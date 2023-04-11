@@ -50,7 +50,7 @@ class TestProfiWiki(Basetest):
         """
         get the mediaWikiApp
         """
-        if argv is None:
+        if not argv:
             argv=self.argv
         self.pw=self.getProfiWiki(argv)
         self.pw.config.forceRebuild=forceRebuild
