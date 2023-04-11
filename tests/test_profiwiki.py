@@ -71,7 +71,7 @@ class TestProfiWiki(Basetest):
         start mediawiki application
         """
         forceRebuild=True
-        mwApp=self.getMwApp(forceRebuild)
+        mwApp=self.getMwApp(forceRebuild=forceRebuild)
         self.doStartMwApp(mwApp)
         return mwApp
     
