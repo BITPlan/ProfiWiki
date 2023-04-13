@@ -37,7 +37,7 @@ class ProfiWiki():
         self.config.port=port
         self.config.versions=[mw_version]
         self.config.container_base_name="pw"
-        self.config.extensionNameList=["Admin Links","Diagrams","Header Tabs","ImageMap","MagicNoCache","Maps9",
+        self.config.extensionNameList=["Admin Links","Diagrams","Header Tabs","ImageMap","ImageLink","MagicNoCache","Maps9",
                                "Mermaid","MsUpload","Nuke","Page Forms","ParserFunctions","PDFEmbed","Renameuser",
                                "Replace Text","Semantic Result Formats","SyntaxHighlight","Variables","UserFunctions"]
         self.config.logo="https://wiki.bitplan.com/images/wiki/thumb/6/63/Profiwikiicon.png/96px-Profiwikiicon.png"
