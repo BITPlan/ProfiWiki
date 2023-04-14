@@ -84,6 +84,7 @@ class ProfiWiki():
             pmw.install_fontawesome()
             pmw.install_plantuml()
             self.patch(pmw)
+            self.update(pmw)
             pmw.start_cron()
         if args.create:
             self.create(mwApp, args.forceRebuild)
@@ -103,6 +104,8 @@ class ProfiWiki():
                 pmw.start_cron()
             if args.patch:
                 self.patch(pmw)
+        if args.update:
+            self.update(mwApp)
             
     def createOrModifyWikiUser(self,mwApp,force_overwrite:bool=False)->WikiUser:
         """
@@ -219,6 +222,12 @@ $wgGroupPermissions['*']['embed_pdf'] = true;
             patch.add_text(lines)
             patch.save()
             pwc.dc.container.copy_to(ls_file.name,ls_path)
+
+    def update(self,mwApp):
+        """
+        run the update script
+        """
+        mwApp.execute("/root/update.sh")
         
     def check(self,mwApp):
         """
