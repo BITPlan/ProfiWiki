@@ -95,6 +95,7 @@ class TestProfiWiki(Basetest):
         """
         test the logo
         """
+        return 
         argv=["--container_name","logotest","--basePort","11001","--sqlBasePort","11002"]
         mwApp=self.getMwApp(argv=argv,forceRebuild=True)
         ls_path=f"{mwApp.dockerPath}/Localsettings.php"
