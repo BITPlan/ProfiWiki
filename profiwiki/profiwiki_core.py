@@ -178,6 +178,11 @@ class ProfiWiki():
             pwc.dc.container.copy_from(ls_path,ls_file.name)
             patch=Patch(file_path=ls_file.name)
             lines=f"""// modified by profiwiki 
+# make this an intranet - comment out if you want this to be a public wiki
+# The following permissions were set based on your choice in the installer
+$wgGroupPermissions['*']['createaccount'] = false;
+$wgGroupPermissions['*']['edit'] = false;
+$wgGroupPermissions['*']['read'] = false;
 // allow raw HTML 
 $wgRawHtml = true;
 // allow images
@@ -186,8 +191,30 @@ $wgAllowImageTag=true;
 $wgUseInstantCommons = true;
 // avoid showing (expected) deprecation warnings
 error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
+# # add support for special properties
+# see https://www.semantic-mediawiki.org/wiki/Help:$smwgPageSpecialProperties
+# Modification date
+$smwgPageSpecialProperties[] = '_MDAT';
+# Creation date
+$smwgPageSpecialProperties[] = '_CDAT';
+# Is a new page
+$smwgPageSpecialProperties[] = '_NEWP';
+# Last editor is
+$smwgPageSpecialProperties[] = '_LEDT';
+# Media type
+$smwgPageSpecialProperties[] = '_MEDIA';
+# MIME type
+$smwgPageSpecialProperties[] = '_MIME';
 // https://www.mediawiki.org/wiki/Extension:UserFunctions
 $wgUFEnabledPersonalDataFunctions = ['ip','nickname','realname','useremail','username',];
+# increase query limit
+$smwgQMaxLimit = 20000;
+//Default width for the PDF object container.
+$wgPdfEmbed['width'] = 800;
+//Default height for the PDF object container.
+$wgPdfEmbed['height'] = 1090;
+//Allow user the usage of the tag 
+$wgGroupPermissions['*']['embed_pdf'] = true;
 """
             patch.add_text(lines)
             patch.save()
