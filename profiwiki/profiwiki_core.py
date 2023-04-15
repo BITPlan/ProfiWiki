@@ -11,7 +11,6 @@ import os
 from mwdocker.mwcluster import MediaWikiCluster
 from mwdocker.docker import DockerApplication
 from profiwiki.docker import ProfiWikiContainer
-from wikibot3rd.wikiuser import WikiUser
 from mwdocker.config import MwClusterConfig
 from profiwiki.patch import Patch
 
@@ -28,9 +27,9 @@ class ProfiWiki():
         self.os_uname=os.uname()
         self.os_release=platform.release()
         self.args=None
-        self.wikiUser=None
         self.config=MwClusterConfig()
         self.config.smwVersion=smw_version
+        self.config.random_password=True
         self.config.prefix=prefix
         self.config.basePort=port
         self.config.sqlPort=port-1
@@ -65,7 +64,7 @@ class ProfiWiki():
             args(Namespace): the command line arguments
         """
         self.config.fromArgs(args)
-        self.wiki_id=f"{self.config.container_base_name}"
+        self.config.wikiId=self.config.container_base_name
         if args.bash:
             cmd=f"docker exec -it {self.config.container_base_name}-mw /bin/bash"
             print(cmd)
@@ -74,14 +73,7 @@ class ProfiWiki():
         if self.config.verbose:
             print(f"ProfiWiki {mwApp.config.container_base_name} using port {mwApp.config.port} sqlport {mwApp.config.sqlPort}")
    
-        if args.randompassword:
-            mwApp.config.password=self.config.random_password()
-            self.wikiUser=self.createOrModifyWikiUser(mwApp,force_overwrite=args.forceuser)
-        if args.wikiuser and not self.wikiUser:
-            self.createOrModifyWikiUser(mwApp,force_overwrite=args.forceuser)
         if args.all:
-            if not self.wikiUser:
-                self.wikiUser=self.createOrModifyWikiUser(mwApp,force_overwrite=args.forceuser)
             self.create(mwApp, args.forceRebuild)
             pmw,_pdb=self.getProfiWikiContainers(mwApp)
             pmw.install_fontawesome()
@@ -109,24 +101,6 @@ class ProfiWiki():
                 self.patch(pmw)
         if args.update:
             self.update(mwApp)
-            
-    def createOrModifyWikiUser(self,mwApp,force_overwrite:bool=False)->WikiUser:
-        """
-        create or modify the WikiUser for this profiwiki
-        
-        Args:
-            mwApp(DockerApplication): the mediawiki docker application
-            force_overwrite(bool): if True overwrite the wikuser info
-        """
-        wikiUsers=WikiUser.getWikiUsers(lenient=True)
-        if self.wiki_id in wikiUsers and not force_overwrite:
-            wikiUser=wikiUsers[self.wiki_id]          
-            if self.config.password != wikiUser.getPassword():
-                raise Exception(f"wikiUser for wiki {self.wiki_id} already exists but with different password")
-            pass
-        else:
-            wikiUser=mwApp.createWikiUser(self.wiki_id,store=True)
-        return wikiUser
     
     def getMwCluster(self,withGenerate:bool=True)->MediaWikiCluster:
         """
