@@ -71,8 +71,11 @@ class ProfiWiki():
             print(cmd)
             return
         mwApp=self.getMwApp(withGenerate=args.forceRebuild)
+        if self.config.verbose:
+            print(f"ProfiWiki {mwApp.config.container_base_name} using port {mwApp.config.port} sqlport {mwApp.config.sqlPort}")
+   
         if args.randompassword:
-            self.password=self.config.random_password()
+            mwApp.config.password=self.config.random_password()
             self.wikiUser=self.createOrModifyWikiUser(mwApp,force_overwrite=args.forceuser)
         if args.wikiuser and not self.wikiUser:
             self.createOrModifyWikiUser(mwApp,force_overwrite=args.forceuser)
@@ -137,8 +140,6 @@ class ProfiWiki():
         """
         if self.mwCluster is not None:
             return self.mwCluster
-        if self.config.verbose:
-            print(f"ProfiWiki {self.config.prefix} using port {self.config.port}")
         mwCluster=MediaWikiCluster(config=self.config)
         # generate
         mwCluster.createApps(withGenerate=withGenerate)
