@@ -38,6 +38,7 @@ class ProfiWikiCmd():
         parser.add_argument("--bash",help="bash into container",action="store_true")
         parser.add_argument("--create",action="store_true",help="create the wiki") 
         parser.add_argument("--check",action="store_true",help="check the wiki")  
+        parser.add_argument("--update",action="store_true",help="start the update script -e.g. to fix SMW key")  
         parser.add_argument("--cron",action="store_true",help="start cron service")        
         parser.add_argument("--down", action="store_true", help="shutdown the wiki [default: %(default)s]")
         parser.add_argument("--patch", action="store_true", help="apply LocalSettings.php patches [default: %(default)s]")
