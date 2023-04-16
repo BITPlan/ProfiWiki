@@ -28,11 +28,11 @@ class ProfiWiki():
         self.os_release=platform.release()
         self.args=None
         self.config=MwClusterConfig()
-        self.config.smwVersion=smw_version
+        self.config.smw_version=smw_version
         self.config.random_password=True
         self.config.prefix=prefix
-        self.config.basePort=port
-        self.config.sqlPort=port-1
+        self.config.base_port=port
+        self.config.sql_port=port-1
         self.config.port=port
         self.config.versions=[mw_version]
         self.config.container_base_name="pw"
