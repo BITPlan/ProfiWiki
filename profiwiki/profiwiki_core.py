@@ -64,6 +64,7 @@ class ProfiWiki():
             args(Namespace): the command line arguments
         """
         self.config.fromArgs(args)
+        # make sure the wikiId is set from the container base name
         self.config.wikiId=self.config.container_base_name
         if args.bash:
             cmd=f"docker exec -it {self.config.container_base_name}-mw /bin/bash"
@@ -187,6 +188,8 @@ $smwgPageSpecialProperties[] = '_MEDIA';
 $smwgPageSpecialProperties[] = '_MIME';
 // https://www.mediawiki.org/wiki/Extension:UserFunctions
 $wgUFEnabledPersonalDataFunctions = ['ip','nickname','realname','useremail','username',];
+// allow user functions in main mediawiki space
+$wgUFAllowedNamespaces[NS_MAIN] = true;
 # increase query limit
 $smwgQMaxLimit = 20000;
 //Default width for the PDF object container.
