@@ -23,7 +23,7 @@ class TestProfiWiki(Basetest):
         # change the port for the testwiki to not spoil a wiki on the default port
         self.pw=ProfiWiki(prefix="pwt1",port=11000)
         self.mwApp=None
-        self.argv=["--prefix","pwt1","--base_port","11000","--sqlBasePort","11001"]
+        self.argv=["--prefix","pwt1","--base_port","11000","--sql_base_port","11001"]
         
     def testConfig(self):
         """
