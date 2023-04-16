@@ -71,7 +71,7 @@ class ProfiWiki():
             return
         mwApp=self.getMwApp(withGenerate=args.forceRebuild)
         if self.config.verbose:
-            print(f"ProfiWiki {mwApp.config.container_base_name} using port {mwApp.config.port} sqlport {mwApp.config.sqlPort}")
+            print(f"ProfiWiki {mwApp.config.container_base_name} using port {mwApp.config.port} sqlport {mwApp.config.sql_port}")
    
         if args.all:
             self.create(mwApp, args.forceRebuild)
@@ -81,6 +81,8 @@ class ProfiWiki():
             self.patch(pmw)
             self.update(mwApp)
             pmw.start_cron()
+        if args.apache:
+            self.apache_config(mwApp)
         if args.create:
             self.create(mwApp, args.forceRebuild)
         if args.check:
@@ -228,3 +230,47 @@ $wgGroupPermissions['*']['embed_pdf'] = true;
         """
         print (json.dumps(mwApp.config.as_dict(),indent=2))
         pass
+    
+    def apache_config(self,mwApp:DockerApplication)->str:
+        """
+        get the apache configuration for the given mediawiki Docker application
+        
+        Args:
+            mwApp(DockerApplication): the docker application to generate the configuration for
+        """
+        config=mwApp.config
+        apache_config=f"""<VirtualHost *:80 >
+    # The ServerName directive sets the request scheme, hostname and port that
+    # the server uses to identify itself. This is used when creating
+    # redirection URLs. In the context of virtual hosts, the ServerName
+    # specifies what hostname must appear in the request's Host: header to
+    # match this virtual host. For the default virtual host (this file) this
+    # value is not decisive as it is used as a last resort host regardless.
+    # However, you must set it for any further virtual host explicitly.
+    ServerName {config.host}
+
+    ServerAdmin webmaster@{config.host}
+    #DocumentRoot /var/www/html
+
+    # Available loglevels: trace8, ..., trace1, debug, info, notice, warn,
+    # error, crit, alert, emerg.
+    # It is also possible to configure the loglevel for particular
+    # modules, e.g.
+    #LogLevel info ssl:warn
+
+    ErrorLog ${{APACHE_LOG_DIR}}/{config.container_base_name}_error.log
+    CustomLog ${{APACHE_LOG_DIR}}/{config.container_base_name}_access.log combined
+
+    # For most configuration files from conf-available/, which are
+    # enabled or disabled at a global level, it is possible to
+    # include a line for only one particular virtual host. For example the
+    # following line enables the CGI configuration for this host only
+    # after it has been globally disabled with "a2disconf".
+    #Include conf-available/serve-cgi-bin.conf
+
+    # Mediawiki installations 
+    ProxyPass / http://localhost:{config.port}/ 
+    ProxyPassReverse / http://localhost:{config.port}/
+</VirtualHost>"""
+        
+        

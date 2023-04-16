@@ -34,6 +34,7 @@ class ProfiWikiCmd():
         parser = ArgumentParser(description=description, formatter_class=RawDescriptionHelpFormatter)
         config.addArgs(parser)
         parser.add_argument("--about", help="show about info [default: %(default)s]", action="store_true")
+        parser.add_argument("--apache",help="generate apache configuration",action="store_true")
         parser.add_argument("--all",help="do all necessary steps for a full setup",action="store_true")
         parser.add_argument("--bash",help="bash into container",action="store_true")
         parser.add_argument("--create",action="store_true",help="create the wiki") 
