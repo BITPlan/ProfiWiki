@@ -81,7 +81,8 @@ class ProfiWiki():
         mwApp=self.getMwApp(withGenerate=args.forceRebuild)
         if self.config.verbose:
             print(f"ProfiWiki {mwApp.config.container_base_name} using port {mwApp.config.port} sqlport {mwApp.config.sql_port}")
-   
+        if args.force_user:
+            mwApp.createWikiUser(store=True)
         if args.all:
             self.create(mwApp, args.forceRebuild)
             pmw,_pdb=self.getProfiWikiContainers(mwApp)
