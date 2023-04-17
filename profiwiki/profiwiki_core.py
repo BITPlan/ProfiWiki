@@ -13,6 +13,7 @@ from mwdocker.docker import DockerApplication
 from profiwiki.docker import ProfiWikiContainer
 from mwdocker.config import MwClusterConfig
 from profiwiki.patch import Patch
+from wikibot3rd.wikiuser import WikiUser
 
 class ProfiWiki():
     """
@@ -36,7 +37,7 @@ class ProfiWiki():
         self.config.port=port
         self.config.versions=[mw_version]
         self.config.container_base_name="pw"
-        self.config.extensionNameList=["Admin Links","Diagrams","Header Tabs","ImageMap","ImageLink","MagicNoCache","Maps9",
+        self.config.extensionNameList=["Admin Links","Diagrams","Graph","Header Tabs","ImageMap","ImageLink","MagicNoCache","Maps9",
                                "Mermaid","MsUpload","Nuke","Page Forms","ParserFunctions","PDFEmbed","Renameuser",
                                "Replace Text","Semantic Result Formats","SyntaxHighlight","Variables","UserFunctions"]
         self.config.logo="https://wiki.bitplan.com/images/wiki/thumb/6/63/Profiwikiicon.png/96px-Profiwikiicon.png"
@@ -65,6 +66,13 @@ class ProfiWiki():
         """
         self.config.fromArgs(args)
         # make sure the wikiId is set from the container base name
+        config_path=self.config.get_config_path()
+        if os.path.isfile(config_path) and not self.config.forceRebuild:
+            # reload the previous configuration e.g. based on container_name only
+            previous_config=self.config.load(config_path)
+            self.config=previous_config
+            if self.config.verbose:
+                print("ProfiWiki with previous configuration ...")
         self.config.wikiId=self.config.container_base_name
         if args.bash:
             cmd=f"docker exec -it {self.config.container_base_name}-mw /bin/bash"
@@ -82,6 +90,8 @@ class ProfiWiki():
             self.patch(pmw)
             self.update(mwApp)
             pmw.start_cron()
+        if args.wikiuser_check:
+            self.check_wikiuser(mwApp)
         if args.apache:
             apache_config=self.apache_config(mwApp)
             print(apache_config)
@@ -235,6 +245,24 @@ $wgGroupPermissions['*']['embed_pdf'] = true;
         print (json.dumps(mwApp.config.as_dict(),indent=2))
         pass
     
+    def check_wikiuser(self,mwApp:DockerApplication):
+        """
+        """
+        print(f"Checking WikiUser ... for {mwApp.config.container_base_name}")
+        wikiUsers=WikiUser.getWikiUsers(lenient=True)
+        if not mwApp.config.wikiId:
+            print("no WikiId configured")
+            return
+        if not mwApp.config.wikiId in wikiUsers:
+            print(f"no wikiUser for wikiId {mwApp.config.wikiId} found")
+            return
+        wikiUser=wikiUsers[mwApp.config.wikiId]
+        if mwApp.config.password != wikiUser.getPassword():
+            print(f"configured password is different then {mwApp.config.wikiId}")
+        else:
+            print(f"wikiUser for wikiId {mwApp.config.wikiId} is available and password as configured")
+        pass
+            
     def apache_config(self,mwApp:DockerApplication)->str:
         """
         get the apache configuration for the given mediawiki Docker application

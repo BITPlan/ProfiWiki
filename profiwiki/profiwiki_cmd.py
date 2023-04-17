@@ -45,6 +45,7 @@ class ProfiWikiCmd():
         parser.add_argument("--patch", action="store_true", help="apply LocalSettings.php patches [default: %(default)s]")
         parser.add_argument("--list",action="store_true",help="list the available profi wikis [default: %(default)s]")
         parser.add_argument("-fa", "--fontawesome",   action="store_true", help="install fontawesome")
+        parser.add_argument("-wuc", "--wikiuser_check",   action="store_true", help="check wikiuser")
         parser.add_argument("-pu", "--plantuml",   action="store_true", help="install plantuml")
         parser.add_argument("-i", "--info", help="show system info", action="store_true")
         parser.add_argument("-V", "--version", action='version', version=version_msg)
