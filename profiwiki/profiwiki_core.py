@@ -83,7 +83,8 @@ class ProfiWiki():
             self.update(mwApp)
             pmw.start_cron()
         if args.apache:
-            self.apache_config(mwApp)
+            apache_config=self.apache_config(mwApp)
+            print(apache_config)
         if args.create:
             self.create(mwApp, args.forceRebuild)
         if args.check:
