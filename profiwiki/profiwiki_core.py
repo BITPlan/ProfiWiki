@@ -276,5 +276,6 @@ $wgGroupPermissions['*']['embed_pdf'] = true;
     ProxyPass / http://localhost:{config.port}/ 
     ProxyPassReverse / http://localhost:{config.port}/
 </VirtualHost>"""
+        return apache_config
         
         
