@@ -176,6 +176,9 @@ class ProfiWiki():
 $wgGroupPermissions['*']['createaccount'] = false;
 $wgGroupPermissions['*']['edit'] = false;
 $wgGroupPermissions['*']['read'] = false;
+# WF 2015-01-20
+# allow string functions - needed for Template:Link
+$wgPFEnableStringFunctions=true;
 // allow raw HTML 
 $wgRawHtml = true;
 // allow images
