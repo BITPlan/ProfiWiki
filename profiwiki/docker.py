@@ -74,13 +74,20 @@ class ProfiWikiContainer():
         script="""#!/bin/bash
 # install fontawesome
 # WF 2023-01-25
+version=6.4.0
+#version=5.15.4
+#version=4.7.0
+zip_url=https://github.com/FortAwesome/Font-Awesome/releases/download/$version/fontawesome-free-$version-desktop.zip
+#https://github.com/FortAwesome/Font-Awesome/releases/download/5.15.4/fontawesome-free-5.15.4-desktop.zip
+
 cd /var/www
-curl https://use.fontawesome.com/releases/v5.15.4/fontawesome-free-5.15.4-web.zip -o fontawesome.zip
+#curl https://use.fontawesome.com/releases/$version/fontawesome-free-$version-web.zip -o fontawesome.zip
+curl --location $zip_url -o fontawesome.zip
 unzip -o fontawesome.zip
-ln -s -f fontawesome-free-5.15.4-web fontawesome
+ln -s -f fontawesome-free-$version-desktop fontawesome
 chown -R www-data.www-data fontawesome
 cd fontawesome
-ln -s svgs/regular svg
+ln -s svgs/solid svg
 cat << EOS > /etc/apache2/conf-available/font-awesome.conf
 Alias /font-awesome /var/www/fontawesome
 <Directory /var/www/fontawesome>
