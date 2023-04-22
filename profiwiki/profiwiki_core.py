@@ -70,9 +70,9 @@ class ProfiWiki():
         if os.path.isfile(config_path) and not self.config.forceRebuild:
             # reload the previous configuration e.g. based on container_name only
             previous_config=self.config.load(config_path)
-            self.config=previous_config
             if self.config.verbose:
-                print("ProfiWiki with previous configuration ...")
+                print(f"ProfiWiki with previous configuration from {config_path}...")
+            self.config=previous_config
         self.config.wikiId=self.config.container_base_name
         if args.bash:
             cmd=f"docker exec -it {self.config.container_base_name}-mw /bin/bash"
