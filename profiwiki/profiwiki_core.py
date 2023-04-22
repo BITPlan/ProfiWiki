@@ -210,6 +210,32 @@ $wgPdfEmbed['width'] = 800;
 $wgPdfEmbed['height'] = 1090;
 //Allow user the usage of the tag 
 $wgGroupPermissions['*']['embed_pdf'] = true;
+// config parameters for MsUpload
+// https://www.mediawiki.org/wiki/Extension:MsUpload
+$wgMSU_useDragDrop = true; // Should the drag & drop area be shown? (Not set by default)
+$wgMSU_showAutoCat = true; // Files uploaded while editing a category page will be added to that category
+$wgMSU_checkAutoCat = true; // Whether the checkbox for adding a category to a page is checked by default
+$wgMSU_useMsLinks = false; // Insert links in Extension:MsLinks style?
+$wgMSU_confirmReplace = true; // Show the "Replace file?" checkbox
+$wgMSU_imgParams = '400px'; // Default image parameters, for example "thumb|200px"
+$wgMSU_uploadsize = '100mb'; // Max upload size through MsUpload
+// general parameters for MsUpload
+$wgEnableWriteAPI = true; // Enable the API
+$wgEnableUploads = true; // Enable uploads
+$wgAllowJavaUploads = true; // Solves problem with Office 2007 and newer files (docx, xlsx, etc.)
+$wgGroupPermissions['user']['upload'] = true; // Allow regular users to upload files
+# add more file upload options
+$wgGroupPermissions['user']['upload_by_url'] = true;
+$wgAllowCopyUploads = true;
+$wgCopyUploadsFromSpecialUpload = true;
+# http://www.mediawiki.org/wiki/Manual:Configuring_file_uploads/de
+$wgFileExtensions = array_merge($wgFileExtensions, array('doc', 'gcode',
+'gpx','htm','html','jscad','jpg','pdf','ppt','docx', 'docxm','xlsx','xlsm','mp3','mp4','odp','otp','pptx', 'pptm','reqif','reqifz','rtf','rythm'
+,'scad','sh','stl','svg','vcf','vim','uew','xls','xml','zip'));
+# allow html
+$wgVerifyMimeType=false;
+# disable upload script checks ...
+$wgDisableUploadScriptChecks = true;
 """
             patch.add_text(lines)
             patch.save()
