@@ -178,6 +178,8 @@ wfLoadExtension( 'WikiEditor' );
 $wgGroupPermissions['*']['createaccount'] = false;
 $wgGroupPermissions['*']['edit'] = false;
 $wgGroupPermissions['*']['read'] = false;
+# Allow properties in Templates
+$smwgNamespacesWithSemanticLinks[NS_TEMPLATE] = true;
 # WF 2015-01-20
 # allow string functions - needed for Template:Link
 $wgPFEnableStringFunctions=true;
