@@ -171,6 +171,8 @@ class ProfiWiki():
             pwc.dc.container.copy_from(ls_path,ls_file.name)
             patch=Patch(file_path=ls_file.name)
             lines=f"""// modified by profiwiki 
+// use WikiEditor e.g. for MsUpload
+wfLoadExtension( 'WikiEditor' );
 # make this an intranet - comment out if you want this to be a public wiki
 # The following permissions were set based on your choice in the installer
 $wgGroupPermissions['*']['createaccount'] = false;
