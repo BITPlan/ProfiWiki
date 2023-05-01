@@ -62,10 +62,29 @@ class ProfiWikiContainer():
         """
         install plantuml to this container
         """
+        script="""#!/bin/bash
+# install plantuml
+# WF 2023-05-01
+apt-get update
+apt-get install -y plantuml
+"""
         # https://gabrieldemarmiesse.github.io/python-on-whales/docker_objects/containers/
-        self.dc.container.execute(["apt-get","update"],tty=True)
-        self.dc.container.execute(["apt-get","install","-y","plantuml"],tty=True)
+        script_path="/root/install_plantuml.sh"
+        self.install_and_run_script(script, script_path)
         pass
+    
+    def install_and_run_script(self,script:str,script_path:str):
+        """
+        install and run the given script
+        
+        Args:
+            script(str): the source code of the script
+            script_path(str): the path to copy the script to and then execute
+        """
+        self.upload(script,script_path)
+        # make executable
+        self.dc.container.execute(["chmod","+x",script_path])
+        self.dc.container.execute([script_path],tty=True)
     
     def install_fontawesome(self):
         """
@@ -98,10 +117,7 @@ EOS
 a2enconf font-awesome
 """
         script_path="/root/install_fontawesome"
-        self.upload(script,"/root/install_fontawesome")
-        # make executable
-        self.dc.container.execute(["chmod","+x",script_path])
-        self.dc.container.execute([script_path],tty=True)
+        self.install_and_run_script(script, script_path)
         try:
             self.dc.container.execute(["service","apache2","restart"])
         except DockerException as e:
