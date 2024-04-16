@@ -45,6 +45,7 @@ class ProfiWiki:
         self.config.sql_port = port - 1
         self.config.port = port
         self.config.versions = [mw_version]
+        self.config.version=mw_version
         self.config.container_base_name = "pw"
         self.config.extensionNameList = [
             "Admin Links",
