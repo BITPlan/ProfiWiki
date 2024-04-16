@@ -170,6 +170,8 @@ class ProfiWiki:
         get my mediawiki Docker application
         """
         mwCluster = self.getMwCluster(withGenerate)
+        if not self.config.version in mwCluster.apps:
+            raise Exception(f"Mediawiki version {self.config.version} missing {mwCluster.apps.keys()}")
         mwApp = mwCluster.apps[self.config.version]
         return mwApp
 
