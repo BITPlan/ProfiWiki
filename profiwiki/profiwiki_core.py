@@ -39,7 +39,7 @@ class ProfiWiki:
         self.args = None
         self.config = MwClusterConfig()
         self.config.smw_version = smw_version
-        self.config.random_password = True
+        self.config.random_password = False
         self.config.prefix = prefix
         self.config.base_port = port
         self.config.sql_port = port - 1
