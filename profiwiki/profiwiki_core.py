@@ -68,6 +68,7 @@ class ProfiWiki:
             "SyntaxHighlight",
             "Variables",
             "UserFunctions",
+            "YouTube"
         ]
         self.config.logo = "https://wiki.bitplan.com/images/wiki/thumb/6/63/Profiwikiicon.png/96px-Profiwikiicon.png"
         self.config.__post_init__()
