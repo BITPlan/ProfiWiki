@@ -27,7 +27,7 @@ class ProfiWiki:
         self,
         prefix: str = "pw",
         smw_version="4.1.3",
-        mw_version="1.39.7",
+        mw_version="1.39.8",
         port: int = 9079,
     ):
         """
@@ -206,7 +206,7 @@ class ProfiWiki:
             pwc.log_action(f"patching {ls_file.name}")
             pwc.dc.container.copy_from(ls_path, ls_file.name)
             patch = Patch(file_path=ls_file.name)
-            lines = f"""// modified by profiwiki 
+            lines = f"""// modified by profiwiki
 // use WikiEditor e.g. for MsUpload
 wfLoadExtension( 'WikiEditor' );
 # make this an intranet - comment out if you want this to be a public wiki
@@ -219,7 +219,7 @@ $smwgNamespacesWithSemanticLinks[NS_TEMPLATE] = true;
 # WF 2015-01-20
 # allow string functions - needed for Template:Link
 $wgPFEnableStringFunctions=true;
-// allow raw HTML 
+// allow raw HTML
 $wgRawHtml = true;
 // allow images
 $wgAllowImageTag=true;
@@ -251,7 +251,7 @@ $smwgQMaxLimit = 20000;
 $wgPdfEmbed['width'] = 800;
 //Default height for the PDF object container.
 $wgPdfEmbed['height'] = 1090;
-//Allow user the usage of the tag 
+//Allow user the usage of the tag
 $wgGroupPermissions['*']['embed_pdf'] = true;
 // config parameters for MsUpload
 // https://www.mediawiki.org/wiki/Extension:MsUpload
@@ -371,8 +371,8 @@ $wgDisableUploadScriptChecks = true;
     # after it has been globally disabled with "a2disconf".
     #Include conf-available/serve-cgi-bin.conf
 
-    # Mediawiki installations 
-    ProxyPass / http://localhost:{config.port}/ 
+    # Mediawiki installations
+    ProxyPass / http://localhost:{config.port}/
     ProxyPassReverse / http://localhost:{config.port}/
 </VirtualHost>"""
         return apache_config
