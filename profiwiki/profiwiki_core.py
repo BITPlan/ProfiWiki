@@ -3,6 +3,7 @@ Created on 2023-04-01
 
 @author: wf
 """
+
 import datetime
 import json
 import os
@@ -45,7 +46,7 @@ class ProfiWiki:
         self.config.sql_port = port - 1
         self.config.port = port
         self.config.versions = [mw_version]
-        self.config.version=mw_version
+        self.config.version = mw_version
         self.config.container_base_name = "pw"
         self.config.extensionNameList = [
             "Admin Links",
@@ -68,7 +69,7 @@ class ProfiWiki:
             "SyntaxHighlight",
             "Variables",
             "UserFunctions",
-            "YouTube"
+            "YouTube",
         ]
         self.config.logo = "https://wiki.bitplan.com/images/wiki/thumb/6/63/Profiwikiicon.png/96px-Profiwikiicon.png"
         self.config.__post_init__()
@@ -173,7 +174,9 @@ class ProfiWiki:
         """
         mwCluster = self.getMwCluster(withGenerate)
         if not self.config.version in mwCluster.apps:
-            raise Exception(f"Mediawiki version {self.config.version} missing {mwCluster.apps.keys()}")
+            raise Exception(
+                f"Mediawiki version {self.config.version} missing {mwCluster.apps.keys()}"
+            )
         mwApp = mwCluster.apps[self.config.version]
         return mwApp
 
