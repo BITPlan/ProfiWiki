@@ -17,7 +17,7 @@ dependencies = [
   #https://pypi.org/project/pymediawikidocker/
   "pymediawikidocker>=0.13.2",
   # https://pypi.org/project/py-3rdparty-mediawiki/
-  "py-3rdparty-mediawiki>=0.13.4"
+  "py-3rdparty-mediawiki>=0.13.5"
 ]
 
 requires-python = ">=3.9"
