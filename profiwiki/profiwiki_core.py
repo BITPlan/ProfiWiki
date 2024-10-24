@@ -27,8 +27,8 @@ class ProfiWiki:
     def __init__(
         self,
         prefix: str = "pw",
-        smw_version="4.1.3",
-        mw_version="1.39.8",
+        smw_version="4.2.0",
+        mw_version="1.39.10",
         port: int = 9079,
     ):
         """
