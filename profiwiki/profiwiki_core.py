@@ -56,7 +56,7 @@ class ProfiWiki:
             "ImageMap",
             "ImageLink",
             "MagicNoCache",
-            "Maps9",
+            "Maps12",
             "Mermaid",
             "MsUpload",
             "Nuke",
@@ -66,6 +66,7 @@ class ProfiWiki:
             "Renameuser",
             "Replace Text",
             "Semantic Result Formats",
+            "Scribunto",
             "SyntaxHighlight",
             "Variables",
             "UserFunctions",
@@ -96,6 +97,9 @@ class ProfiWiki:
             args(Namespace): the command line arguments
         """
         self.config.fromArgs(args)
+        if len(self.config.versions)==1:
+            self.config.version=self.config.versions[0]
+
         # make sure the wikiId is set from the container base name
         config_path = self.config.get_config_path()
         if os.path.isfile(config_path) and not self.config.forceRebuild:
