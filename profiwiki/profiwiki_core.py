@@ -56,7 +56,7 @@ class ProfiWiki:
             "ImageMap",
             "ImageLink",
             "MagicNoCache",
-            "Maps12",
+            "Maps11",
             "Mermaid",
             "MsUpload",
             "Nuke",
