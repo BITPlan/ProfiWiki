@@ -108,7 +108,7 @@ cd /var/www
 curl --location $zip_url -o fontawesome.zip
 unzip -o fontawesome.zip
 ln -s -f fontawesome-free-$version-desktop fontawesome
-chown -R www-data.www-data fontawesome
+chown -R www-data:www-data fontawesome
 cd fontawesome
 ln -s svgs/solid svg
 cat << EOS > /etc/apache2/conf-available/font-awesome.conf
