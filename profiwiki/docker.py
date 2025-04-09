@@ -35,29 +35,43 @@ class ProfiWikiContainer:
         else:
             print(f"{action}", flush=True)
 
-    def wait_ready(self, timeout=5, check_interval=0.1):
+    def wait_ready(self, timeout=5, check_interval=0.1, verbose=True):
         """
         Wait until the container is fully ready to accept commands
 
         Args:
             timeout (int): Maximum time to wait in seconds
             check_interval (float): Time between checks in seconds
+            verbose (bool): If True, print status messages during waiting
 
-        Returns:
-            bool: True if container is ready, False if timeout occurred
+        Raises:
+            TimeoutError: If the container is not ready after the timeout period
         """
         start_time = time.time()
+        tries = 0
 
         while time.time() - start_time < timeout:
+            tries += 1
+            if verbose:
+                print(f"Checking if container is ready (try {tries})...")
+
             try:
                 # Try a simple command to check if container is ready
                 self.dc.container.execute(["test", "-e", "/bin"], tty=True)
+                if verbose:
+                    print(f"Container ready after {tries} tries")
                 return True
             except Exception as e:
                 # If still not ready, wait and try again
+                if verbose:
+                    print(f"Container not ready on try {tries}: {e}")
                 time.sleep(check_interval)
 
-        return False
+        # If we've reached this point, the timeout has expired
+        error_msg = f"Container not ready after {tries} tries and {timeout} seconds"
+        if verbose:
+            print(error_msg)
+        raise TimeoutError(error_msg)
 
     def upload(self, text: str, path: str,with_wait:bool=True):
         """
