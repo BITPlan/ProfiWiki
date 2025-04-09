@@ -5,6 +5,7 @@ Created on 2023-04-01
 """
 
 import tempfile
+import time
 
 from mwdocker.docker import DockerContainer
 from python_on_whales import DockerException
@@ -34,7 +35,31 @@ class ProfiWikiContainer:
         else:
             print(f"{action}", flush=True)
 
-    def upload(self, text: str, path: str):
+    def wait_ready(self, timeout=5, check_interval=0.1):
+        """
+        Wait until the container is fully ready to accept commands
+
+        Args:
+            timeout (int): Maximum time to wait in seconds
+            check_interval (float): Time between checks in seconds
+
+        Returns:
+            bool: True if container is ready, False if timeout occurred
+        """
+        start_time = time.time()
+
+        while time.time() - start_time < timeout:
+            try:
+                # Try a simple command to check if container is ready
+                self.dc.container.execute(["test", "-e", "/bin"], tty=True)
+                return True
+            except Exception as e:
+                # If still not ready, wait and try again
+                time.sleep(check_interval)
+
+        return False
+
+    def upload(self, text: str, path: str,with_wait:bool=True):
         """
         upload the given text to the given path
         """
@@ -43,6 +68,8 @@ class ProfiWikiContainer:
             with open(tmp.name, "w") as text_file:
                 text_file.write(text)
             self.dc.container.copy_to(tmp.name, path)
+        if with_wait:
+            self.wait_ready()
 
     def killremove(self, volumes: bool = False):
         """
@@ -86,8 +113,11 @@ apt-get install -y plantuml
             script_path(str): the path to copy the script to and then execute
         """
         self.upload(script, script_path)
-        # make executable
-        self.dc.container.execute(["/usr/bin/chmod", "+x", script_path])
+        # make executable - this is potentially buggy see
+        # https://github.com/moby/moby/issues/40399 suggesting that
+        # stdin/stdout handling might be problematic
+        self.dc.container.execute(["chmod", "+x", script_path],tty=True)
+        # run
         self.dc.container.execute([script_path], tty=True)
 
     def install_fontawesome(self):
