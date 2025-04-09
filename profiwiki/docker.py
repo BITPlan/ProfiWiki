@@ -87,7 +87,7 @@ apt-get install -y plantuml
         """
         self.upload(script, script_path)
         # make executable
-        self.dc.container.execute(["chmod", "+x", script_path])
+        self.dc.container.execute(["/usr/bin/chmod", "+x", script_path])
         self.dc.container.execute([script_path], tty=True)
 
     def install_fontawesome(self):
