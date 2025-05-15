@@ -41,6 +41,7 @@ class ProfiWiki:
         self.config = MwClusterConfig()
         self.config.smw_version = smw_version
         self.config.random_password = False
+        self.config.lenient=True
         self.config.prefix = prefix
         self.config.base_port = port
         self.config.sql_port = port - 1
