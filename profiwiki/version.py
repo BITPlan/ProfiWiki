@@ -16,12 +16,12 @@ class Version(object):
     description = """BITPlan's professional Semantic Mediawiki"""
     version = profiwiki.__version__
     date = "2023-04-01"
-    updated = "2025-05-15"
+    updated = "2025-05-19"
     authors = "Wolfgang Fahl"
     doc_url = "https://wiki.bitplan.com/index.php/ProfiWiki"
     chat_url = "https://github.com/BITPlan/ProfiWiki/discussions"
     cm_url = "https://github.com/BITPlan/ProfiWiki"
-    license = f"""Copyright 2015-2024 contributors. All rights reserved.
+    license = f"""Copyright 2015-2025 contributors. All rights reserved.
   Licensed under the Apache License 2.0
   http://www.apache.org/licenses/LICENSE-2.0
   Distributed on an "AS IS" basis without warranties
