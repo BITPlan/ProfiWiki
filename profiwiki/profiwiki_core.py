@@ -96,6 +96,7 @@ class ProfiWiki:
         Args:
             args(Namespace): the command line arguments
         """
+        self.args=args
         self.config.fromArgs(args)
         if len(self.config.versions)==1:
             self.config.version=self.config.versions[0]
