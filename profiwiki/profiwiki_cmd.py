@@ -47,7 +47,8 @@ class ProfiWikiCmd:
             action="store_true",
         )
         parser.add_argument(
-            "--apache", help="generate apache configuration", action="store_true"
+            "--apache",
+            help="generate apache configuration for the given server name",
         )
         parser.add_argument(
             "--all", help="do all necessary steps for a full setup", action="store_true"
@@ -146,7 +147,7 @@ def main(argv=None):  # IGNORE:C0111
 
     program_name = "profiwiki"
     program_version = f"v{Version.version}"
-    program_build_date = str(Version.date)
+    program_build_date = str(Version.updated)
     program_version_message = f"{program_name} ({program_version},{program_build_date})"
 
     args = None
