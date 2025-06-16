@@ -7,7 +7,7 @@ Created on 2023-04-09
 import tempfile
 
 from profiwiki.patch import Patch
-from tests.basetest import Basetest
+from basemkit.basetest import Basetest
 
 
 class TestPatch(Basetest):
@@ -57,8 +57,8 @@ $wgAllowImageTag=true;"""
 
     def test_quirk(self):
         lines = """
-        // modified by profiwiki 
-// allow raw HTML 
+        // modified by profiwiki
+// allow raw HTML
 $wgRawHtml = true;
 // allow images
 $wgAllowImageTag=true;

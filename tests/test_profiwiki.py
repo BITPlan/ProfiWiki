@@ -9,7 +9,7 @@ import os
 from argparse import ArgumentParser
 
 from profiwiki.profiwiki_core import ProfiWiki
-from tests.basetest import Basetest
+from basemkit.basetest import Basetest
 
 # from mwdocker.webscrape import WebScrape
 

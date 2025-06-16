@@ -14,6 +14,10 @@ maintainers = [
 readme = "README.md"
 license= "Apache-2.0"
 dependencies = [
+  # https://pypi.org/project/pybasemkit/
+  # https://github.com/WolfgangFahl/pybasemkit
+  # Python base module kit: YAML/JSON I/O, structured logging, CLI tooling, shell execution, and remote pydevd debug support.
+  "pybasemkit>=0.0.1",
   #https://pypi.org/project/pymediawikidocker/
   "pymediawikidocker>=0.15.6",
   # https://pypi.org/project/py-3rdparty-mediawiki/
@@ -61,3 +65,4 @@ only-include = ["profiwiki"]
 
 [project.scripts]
 profiwiki = "profiwiki.profiwiki_cmd:main"
+tsite = "profiwiki.tsite:main"

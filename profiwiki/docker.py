@@ -73,7 +73,7 @@ class ProfiWikiContainer:
             print(error_msg)
         raise TimeoutError(error_msg)
 
-    def upload(self, text: str, path: str,with_wait:bool=True):
+    def upload(self, text: str, path: str, with_wait: bool = True):
         """
         upload the given text to the given path
         """
@@ -130,7 +130,7 @@ apt-get install -y plantuml
         # make executable - this is potentially buggy see
         # https://github.com/moby/moby/issues/40399 suggesting that
         # stdin/stdout handling might be problematic
-        self.dc.container.execute(["chmod", "+x", script_path],tty=True)
+        self.dc.container.execute(["chmod", "+x", script_path], tty=True)
         # run
         self.dc.container.execute([script_path], tty=True)
 
