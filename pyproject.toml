@@ -65,4 +65,4 @@ only-include = ["profiwiki"]
 
 [project.scripts]
 profiwiki = "profiwiki.profiwiki_cmd:main"
-tsite = "profiwiki.tsite:main"
+
