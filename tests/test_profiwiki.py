@@ -4,16 +4,17 @@ Created on 2023-04-01
 @author: wf
 """
 
+from argparse import ArgumentParser
 import json
 import os
-from argparse import ArgumentParser
 
-from profiwiki.profiwiki_core import ProfiWiki
 from basemkit.basetest import Basetest
+from profiwiki.profiwiki_cmd import ProfiWikiCmd
+from profiwiki.profiwiki_core import ProfiWiki
+from profiwiki.version import Version
+
 
 # from mwdocker.webscrape import WebScrape
-
-
 class TestProfiWiki(Basetest):
     """
     test ProfiWiki
@@ -34,6 +35,8 @@ class TestProfiWiki(Basetest):
             "11000",
             "--sql_base_port",
             "11001",
+            "--apache",
+            "test.bitplan.com"
         ]
 
     def testConfig(self):
@@ -50,11 +53,11 @@ class TestProfiWiki(Basetest):
         """
         get a profiwiki for the given command line arguments
         """
-        parser = ArgumentParser()
         pw = ProfiWiki()
-        pw.config.addArgs(parser)
-        args = parser.parse_args(argv)
-        pw.config.fromArgs(args)
+        parser=ProfiWikiCmd.get_arg_parser(self,pw.config,
+            description=Version.license, version_msg="ProfiWiki for test")
+        pw.args = parser.parse_args(argv)
+        pw.config.fromArgs(pw.args)
         return pw
 
     def getMwApp(self, argv=None, forceRebuild: bool = False):
@@ -102,9 +105,10 @@ class TestProfiWiki(Basetest):
         mwApp = self.getMwApp()
         apache_config = self.pw.apache_config(mwApp)
         debug = self.debug
-        debug = True
+        #debug = True
         if debug:
             print(apache_config)
+        self.assertTrue("ServerName test.bitplan.com" in apache_config)
 
     def test_create(self):
         """
