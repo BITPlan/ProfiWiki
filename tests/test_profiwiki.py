@@ -3,8 +3,6 @@ Created on 2023-04-01
 
 @author: wf
 """
-
-from argparse import ArgumentParser
 import json
 import os
 
