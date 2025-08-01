@@ -16,7 +16,7 @@ class Version(object):
     description = """BITPlan's professional Semantic Mediawiki"""
     version = profiwiki.__version__
     date = "2023-04-01"
-    updated = "2025-07-31"
+    updated = "2025-08-01"
     authors = "Wolfgang Fahl"
     doc_url = "https://wiki.bitplan.com/index.php/ProfiWiki"
     chat_url = "https://github.com/BITPlan/ProfiWiki/discussions"
