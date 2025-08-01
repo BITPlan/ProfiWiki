@@ -100,6 +100,9 @@ class ProfiWiki:
         """
         self.args = args
         self.config.fromArgs(args)
+        # use bind mount if we are in family mode
+        if self.args.family:
+            self.config.bind_mount=True
         if len(self.config.versions) == 1:
             self.config.version = self.config.versions[0]
 
