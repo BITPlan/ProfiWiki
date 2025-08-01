@@ -115,7 +115,7 @@ class ProfiWiki:
             cmd = f"docker exec -it {self.config.container_base_name}-mw /bin/bash"
             print(cmd)
             return
-        mwApp = self.getMwApp(withGenerate=args.forceRebuild)
+        mwApp = self.getMwApp(withGenerate=self.config.forceRebuild)
         if self.config.verbose:
             print(
                 f"ProfiWiki {mwApp.config.container_base_name} using port {mwApp.config.port} sqlport {mwApp.config.sql_port}"
@@ -123,7 +123,7 @@ class ProfiWiki:
         if args.force_user:
             mwApp.createWikiUser(store=True)
         if args.all:
-            self.create(mwApp, args.forceRebuild)
+            self.create(mwApp, self.config.forceRebuild)
             pmw, _pdb = self.getProfiWikiContainers(mwApp)
             pmw.install_fontawesome()
             pmw.install_plantuml()
@@ -136,11 +136,11 @@ class ProfiWiki:
             apache_config = self.apache_config(mwApp)
             print(apache_config)
         if args.create:
-            self.create(mwApp, args.forceRebuild)
+            self.create(mwApp, self.config.forceRebuild)
         if args.check:
             self.check(mwApp)
         if args.down:
-            self.down(mwApp, args.forceRebuild)
+            self.down(mwApp, self.config.forceRebuild)
         if args.list:
             self.list(mwApp)
         if args.plantuml or args.fontawesome or args.cron or args.patch:
