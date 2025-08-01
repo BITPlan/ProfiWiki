@@ -66,7 +66,8 @@ class ProfiWiki:
             "PDFEmbed",
             "Renameuser",
             "Replace Text",
-            "Semantic Result Formats",
+            #"Semantic Result Formats", Version4
+            "SRF5",
             "Scribunto",
             "SyntaxHighlight",
             "Variables",
