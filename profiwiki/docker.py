@@ -10,7 +10,7 @@ import time
 
 from mwdocker.docker import DockerContainer
 from python_on_whales import DockerException
-
+from python_on_whales import docker as pow_docker
 
 class ProfiWikiContainer:
     """
@@ -142,7 +142,7 @@ apt-get install -y plantuml
             script_to_execute: absolute path inside the container where the script will be placed and executed
             sudo: whether to use sudo inside the container
         """
-        self.dc.copy_file(local_script_path, script_to_execute)
+        pow_docker.copy(local_script_path, (self.dc.container.name, script_to_execute))
         self.run_script_in_container(script_to_execute, sudo=sudo)
 
 
