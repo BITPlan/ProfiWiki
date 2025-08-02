@@ -114,7 +114,7 @@ apt-get update
 apt-get install -y plantuml
 """
         # https://gabrieldemarmiesse.github.io/python-on-whales/docker_objects/containers/
-        script_path = "/root/install_plantuml.sh"
+        script_path = "/scripts/install_plantuml.sh"
         self.install_and_run_script(script, script_path)
         pass
 
@@ -224,7 +224,7 @@ echo "Font Awesome installation complete."
 echo "Access via: /fontawesome4, /fontawesome5, /fontawesome6"
 echo "or shorthand: /fa4, /fa5, /fa6"
 """
-        script_path = "/root/install_fontawesome"
+        script_path = "/scripts/install_fontawesome"
         self.install_and_run_script(script, script_path)
         try:
             self.dc.container.execute(["service", "apache2", "restart"])
