@@ -15,7 +15,7 @@ from mwdocker.docker import DockerApplication
 from mwdocker.mwcluster import MediaWikiCluster
 from wikibot3rd.wikiuser import WikiUser
 
-from profiwiki.docker import ProfiWikiContainer
+from profiwiki.pw_container import ProfiWikiContainer
 from profiwiki.patch import Patch
 
 
