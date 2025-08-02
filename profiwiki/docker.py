@@ -130,7 +130,7 @@ apt-get install -y plantuml
         # make executable - this is potentially buggy see
         # https://github.com/moby/moby/issues/40399 suggesting that
         # stdin/stdout handling might be problematic
-        self.dc.container.execute(["sudo chmod", "+x", script_path], tty=True)
+        self.dc.container.execute(["/usr/bin/sudo","chmod", "+x", script_path], tty=True)
         # run
         self.dc.container.execute([script_path], tty=True)
 
