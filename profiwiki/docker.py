@@ -4,6 +4,7 @@ Created on 2023-04-01
 @author: wf
 """
 
+import os
 import tempfile
 import time
 
@@ -118,114 +119,54 @@ apt-get install -y plantuml
         self.install_and_run_script(script, script_path)
         pass
 
-    def install_and_run_script(self, script: str, script_path: str):
+    def run_script_in_container(self, script_to_execute: str, sudo: bool = False, use_tty: bool = False):
         """
-        install and run the given script
+        Make the script executable and run it in the container.
 
         Args:
-            script(str): the source code of the script
-            script_path(str): the path to copy the script to and then execute
+            script_to_execute: absolute path to the script inside the container
+            sudo: whether to run with sudo
+            use_tty: whether to allocate a pseudo-TTY
         """
-        self.upload(script, script_path)
-        # make executable - this is potentially buggy see
-        # https://github.com/moby/moby/issues/40399 suggesting that
-        # stdin/stdout handling might be problematic
-        self.dc.container.execute(["/usr/bin/sudo","chmod", "+x", script_path], tty=True)
-        # run
-        self.dc.container.execute([script_path], tty=True)
+        self.dc.container.execute(["sudo", "chmod", "755", script_to_execute], tty=use_tty)
+        cmd = ["sudo", "bash", script_to_execute] if sudo else ["bash", script_to_execute]
+        self.dc.container.execute(cmd, tty=use_tty)
+
+
+    def install_and_run_script_from_file(self, local_script_path: str, script_to_execute: str, sudo: bool = False):
+        """
+        Copy a local shell script into the container and execute it.
+
+        Args:
+            local_script_path: path to the local shell script file
+            script_to_execute: absolute path inside the container where the script will be placed and executed
+            sudo: whether to use sudo inside the container
+        """
+        self.dc.copy_file(local_script_path, script_to_execute)
+        self.run_script_in_container(script_to_execute, sudo=sudo)
+
+
+    def install_and_run_script(self, script_content: str, script_to_execute: str, sudo: bool = False):
+        """
+        Upload a script string into the container and execute it.
+
+        Args:
+            script_content: the shell script contents
+            script_to_execute: absolute path inside the container where the script will be saved and executed
+            sudo: whether to use sudo inside the container
+        """
+        self.upload(script_content, script_to_execute)
+        self.run_script_in_container(script_to_execute, sudo=sudo, use_tty=True)
+
 
     def install_fontawesome(self):
         """
         install fontawesome to this container
         """
-        script = """#!/bin/bash
-# Font Awesome installer for Docker environment
-# WF 2025-05-19
-BASE_DIR="/var/www/font-awesome"
-CONF="font-awesome-all"
-APACHE_CONF="/etc/apache2/conf-available/$CONF.conf"
+        local_script = os.path.join(os.path.dirname(__file__), "resources", "install_fontawesome.sh")
 
-# Start fresh configuration
-cat << EOF > "$APACHE_CONF"
-# Font Awesome configurations
-# Generated: $(date)
-# Version: 1.0
-# Author: WF
-# Description:
-#    This configuration provides aliases for three Font Awesome versions
-#    4.5.0, 5.15.4, 6.4.0
-# with version 4.5.0 being the default "official" version.
-EOF
-VERSIONS=("4.5.0" "5.15.4" "6.4.0")
-mkdir -p "$BASE_DIR"
-cd "$BASE_DIR" || exit 1
-
-for version in "${VERSIONS[@]}"; do
-  major="${version%%.*}"
-
-  # Map version directly to the correct directory name
-  case "$major" in
-    4)
-      zip_url="https://download.bitplan.com/font-awesome-4.5.0.zip"
-      zip_file="font-awesome-$version.zip"
-      dir_name="font-awesome"
-      ;;
-    *)
-      zip_url="https://github.com/FortAwesome/Font-Awesome/releases/download/$version/fontawesome-free-$version-desktop.zip"
-      zip_file="fontawesome-$version.zip"
-      dir_name="fontawesome-free-$version-desktop"
-      ;;
-  esac
-
-  echo "Installing Font Awesome $version..."
-
-  # Download and extract only if directory doesn't exist
-  if [ ! -d "$dir_name" ]; then
-    echo "Directory $dir_name not found, downloading and extracting..."
-    curl --silent --fail -L "$zip_url" -o "$zip_file"
-    unzip -q -o "$zip_file"
-    rm -f "$zip_file"
-
-    # Set ownership
-    chown -R www-data:www-data "$dir_name"
-  else
-    echo "Directory $dir_name already exists, skipping download"
-  fi
-
-  # Create compatibility symlink if needed
-  if [ ! -e "$dir_name/svg" ] && [ -d "$dir_name/svgs" ]; then
-    echo "Creating compatibility symlink for $dir_name"
-    ln -sf svgs/solid "$dir_name/svg"
-  fi
-
-  # Create aliases pointing to the correct directories
-  echo "Alias /fontawesome$major $BASE_DIR/$dir_name" >> "$APACHE_CONF"
-  echo "Alias /fa$major $BASE_DIR/$dir_name" >> "$APACHE_CONF"
-  # version 4 is our "official" fontawesome
-  case "$major" in
-    4)
-      echo "Alias /font-awesome $BASE_DIR/$dir_name" >> "$APACHE_CONF"
-      ;;
-  esac
-done
-
-# Add the directory access configuration
-cat <<EOS >> "$APACHE_CONF"
-<Directory $BASE_DIR>
-  Options Indexes FollowSymLinks MultiViews
-  Require all granted
-</Directory>
-EOS
-
-# Enable the new configuration
-a2enconf $CONF > /dev/null
-apache2ctl -k graceful
-echo "Font Awesome installation complete."
-echo "Access via: /fontawesome4, /fontawesome5, /fontawesome6"
-echo "or shorthand: /fa4, /fa5, /fa6"
-"""
         script_path = "/scripts/install_fontawesome"
-        self.install_and_run_script(script, script_path)
+        self.install_and_run_script_from_file(local_script, script_path,sudo=True)
         try:
             self.dc.container.execute(["service", "apache2", "restart"])
         except DockerException as e:
