@@ -135,7 +135,7 @@ class ProfiWiki:
             pmw, _pdb = self.getProfiWikiContainers(mwApp)
             pmw.install_fontawesome()
             pmw.install_plantuml()
-            pmw.pow_docker.commit(pmw.dc.container, repository="profiwiki", tag=mwApp.config.shortVersion)
+            pmw.commit(tag=image_name)
             mwApp.execute("/scripts/setup-mediawiki.sh")
             self.patch(pmw)
         if args.wikiuser_check:

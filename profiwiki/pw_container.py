@@ -41,8 +41,7 @@ class ProfiWikiContainer:
             tag(str): the target image tag e.g. 'ProfiWiki-1.39.13'
         """
         self.log_action(f"committing to image {tag}")
-        pow_docker.commit(self.dc.container, repository=tag)
-
+        pow_docker.commit(tag=tag)
 
     def log_action(self, action: str):
         """
