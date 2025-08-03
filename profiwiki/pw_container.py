@@ -62,10 +62,10 @@ class ProfiWikiContainer:
             sudo: whether to run with sudo
             use_tty: whether to allocate a pseudo-TTY
         """
-        self.dc.execute(f"sudo  chmod 755  {script_to_execute}")
-        cmd = "sudo " if sudo else ""
-        cmd += f"bash {script_to_execute}"
-        self.dc.execute(cmd)
+        self.dc.execute("sudo", "chmod", "755", script_to_execute)
+        cmd = ["sudo"] if sudo else []
+        cmd += ["bash", script_to_execute]
+        self.dc.execute(*cmd)
 
 
     def install_and_run_script_from_file(self, script_name: str, sudo: bool = False):
