@@ -127,10 +127,15 @@ class ProfiWiki:
         if args.force_user:
             mwApp.createWikiUser(store=True)
         if args.all:
+            image_name = f"profiwiki:{mwApp.config.shortVersion}"
+            image_details=ProfiWikiContainer.image_details(image_name)
+            if image_details:
+                pass
             self.create(mwApp, self.config.forceRebuild)
             pmw, _pdb = self.getProfiWikiContainers(mwApp)
             pmw.install_fontawesome()
             pmw.install_plantuml()
+            pmw.pow_docker.commit(pmw.dc.container, repository="profiwiki", tag=mwApp.config.shortVersion)
             mwApp.execute("/scripts/setup-mediawiki.sh")
             self.patch(pmw)
         if args.wikiuser_check:

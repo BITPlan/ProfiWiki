@@ -18,9 +18,31 @@ class ProfiWikiContainer:
     def __init__(self, dc: DockerContainer):
         """
         Args:
-            dc(DockerContainer): the to wrap
+            dc(DockerContainer): the container to wrap
         """
         self.dc = dc
+
+    @staticmethod
+    def image_details(image_name:str):
+        image_details=None
+        try:
+            image_details=pow_docker.image.inspect(image_name)
+        except Exception as ex:
+            if "x" in str(ex):
+                pass
+            pass
+        return image_details
+
+    def commit(self, tag: str):
+        """
+        Commit the current state of this container to a new image.
+
+        Args:
+            tag(str): the target image tag e.g. 'ProfiWiki-1.39.13'
+        """
+        self.log_action(f"committing to image {tag}")
+        pow_docker.commit(self.dc.container, repository=tag)
+
 
     def log_action(self, action: str):
         """
