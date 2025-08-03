@@ -5,8 +5,6 @@ Created on 2023-04-01
 """
 
 import os
-import tempfile
-import time
 
 from mwdocker.docker import DockerContainer
 from python_on_whales import DockerException
@@ -55,7 +53,7 @@ class ProfiWikiContainer:
         self.dc.container.execute(["/usr/sbin/service", "cron", "start"], tty=True)
 
 
-    def run_script_in_container(self, script_to_execute: str, sudo: bool = False, use_tty: bool = False):
+    def run_script_in_container(self, script_to_execute: str, sudo: bool = False):
         """
         Make the script executable and run it in the container.
 
@@ -64,9 +62,10 @@ class ProfiWikiContainer:
             sudo: whether to run with sudo
             use_tty: whether to allocate a pseudo-TTY
         """
-        self.dc.container.execute(["sudo", "chmod", "755", script_to_execute], tty=use_tty)
-        cmd = ["sudo", "bash", script_to_execute] if sudo else ["bash", script_to_execute]
-        self.dc.container.execute(cmd, tty=use_tty)
+        self.dc.execute(f"sudo  chmod 755  {script_to_execute}")
+        cmd = "sudo " if sudo else ""
+        cmd += f"bash {script_to_execute}"
+        self.dc.execute(cmd)
 
 
     def install_and_run_script_from_file(self, script_name: str, sudo: bool = False):
