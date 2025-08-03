@@ -131,9 +131,8 @@ class ProfiWiki:
             pmw, _pdb = self.getProfiWikiContainers(mwApp)
             pmw.install_fontawesome()
             pmw.install_plantuml()
+            mwApp.execute("/scripts/setup-mediawiki.sh")
             self.patch(pmw)
-            self.update(mwApp)
-            pmw.start_cron()
         if args.wikiuser_check:
             self.check_wikiuser(mwApp)
         if args.apache:
@@ -298,12 +297,6 @@ $wgDisableUploadScriptChecks = true;
             patch.add_text(lines)
             patch.save()
             pwc.dc.container.copy_to(ls_file.name, ls_path)
-
-    def update(self, mwApp):
-        """
-        run the update script
-        """
-        mwApp.execute("/root/update.sh")
 
     def check(self, mwApp):
         """

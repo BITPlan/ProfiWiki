@@ -46,12 +46,6 @@ class ProfiWikiContainer:
             self.dc.container.kill()
             self.dc.container.remove(volumes=volumes)
 
-    def start_cron(self):
-        """
-        Starting periodic command scheduler: cron.
-        """
-        self.dc.container.execute(["/usr/sbin/service", "cron", "start"], tty=True)
-
 
     def run_script_in_container(self, script_to_execute: str, sudo: bool = False):
         """
