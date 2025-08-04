@@ -23,15 +23,16 @@ class ProfiWikiContainer:
         self.dc = dc
 
     @staticmethod
-    def image_details(image_name:str):
-        image_details=None
+    def get_image(image_name:str):
+        image=None
         try:
-            image_details=pow_docker.image.inspect(image_name)
+            image=pow_docker.image.inspect(image_name)
         except Exception as ex:
-            if "x" in str(ex):
+            # FIXME filter exceptions that need to be handled
+            if "-something we would like to handle -" in str(ex):
                 pass
             pass
-        return image_details
+        return image
 
     def commit(self, tag: str):
         """

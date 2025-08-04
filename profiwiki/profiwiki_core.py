@@ -128,10 +128,11 @@ class ProfiWiki:
             mwApp.createWikiUser(store=True)
         if args.all:
             image_name = f"profiwiki:{mwApp.config.shortVersion}"
-            image_details=ProfiWikiContainer.image_details(image_name)
-            if image_details:
+            image=ProfiWikiContainer.get_image(image_name)
+            if image:
+                # we could use the image here to speed up
                 pass
-            self.create(mwApp, self.config.forceRebuild)
+            self.create(mwApp,self.config.forceRebuild)
             pmw, _pdb = self.getProfiWikiContainers(mwApp)
             pmw.install_fontawesome()
             pmw.install_plantuml()
@@ -309,7 +310,7 @@ $wgDisableUploadScriptChecks = true;
         """
         mwApp.check()
 
-    def create(self, mwApp, forceRebuild: bool = False):
+    def create(self, mwApp,forceRebuild: bool = False):
         """
         create a profiwiki mediawiki
         """
