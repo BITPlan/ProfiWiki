@@ -51,9 +51,9 @@ class TestProfiWiki(Basetest):
         """
         get a profiwiki for the given command line arguments
         """
-        pw = ProfiWiki()
-        parser=ProfiWikiCmd.get_arg_parser(self,pw.config,
-            description=Version.license, version_msg="ProfiWiki for test")
+        pwcmd=ProfiWikiCmd(Version)
+        pw = pwcmd.pw
+        parser=ProfiWikiCmd.getArgParser(pwcmd,description=Version.license, version_msg="ProfiWiki for test")
         pw.args = parser.parse_args(argv)
         pw.config.fromArgs(pw.args)
         return pw
