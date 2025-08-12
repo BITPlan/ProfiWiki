@@ -19,6 +19,7 @@ Will get your Semantic MediaWiki running in a few minutes.
 
 ### Documentation
 * [Wiki](https://wiki.bitplan.com/index.php/ProfiWiki)
+* [Examples](https://contexts.bitplan.com/index.php/Main_Page)
 ### Features
 * Docker compose based
 * based on official Mediawiki docker image
