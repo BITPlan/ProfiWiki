@@ -137,7 +137,7 @@ class ProfiWiki:
             pmw.install_fontawesome()
             pmw.install_plantuml()
             pmw.commit(tag=image_name)
-            mwApp.execute("/scripts/setup-mediawiki.sh")
+            mwApp.execute("/scripts/setup-mediawiki.sh","--all")
             self.patch(pmw)
         if args.wikiuser_check:
             self.check_wikiuser(mwApp)
