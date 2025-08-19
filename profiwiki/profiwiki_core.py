@@ -130,7 +130,7 @@ class ProfiWiki:
             image_name = f"profiwiki:{mwApp.config.shortVersion}"
             image=ProfiWikiContainer.get_image(image_name)
             if image:
-                # we could use the image here to speed up
+                # we could use the image here to speed up things
                 pass
             self.create(mwApp,self.config.forceRebuild)
             pmw, _pdb = self.getProfiWikiContainers(mwApp)
