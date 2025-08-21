@@ -363,7 +363,6 @@ $wgDisableUploadScriptChecks = true;
 """
         apache_config = f"""{header_comment}<VirtualHost *:443>
     ServerName {server_name}
-
     ServerAdmin webmaster@{config.host}
 
     ErrorLog ${{APACHE_LOG_DIR}}/{config.container_base_name}_error.log

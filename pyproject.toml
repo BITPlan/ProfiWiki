@@ -19,7 +19,7 @@ dependencies = [
   # Python base module kit: YAML/JSON I/O, structured logging, CLI tooling, shell execution, and remote pydevd debug support.
   "pybasemkit>=0.1.1",
   #https://pypi.org/project/pymediawikidocker/
-  "pymediawikidocker>=0.20.4",
+  "pymediawikidocker>=0.20.5",
   # https://pypi.org/project/py-3rdparty-mediawiki/
   "py-3rdparty-mediawiki>=0.17.0"
 ]
