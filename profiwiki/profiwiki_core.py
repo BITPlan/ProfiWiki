@@ -52,7 +52,7 @@ class ProfiWiki:
         self.config.extensionNameList = [
             "Admin Links",
             "Diagrams",
-            "Graph",
+            # "Graph", removed 2025-09-30
             "Header Tabs",
             "ImageMap",
             "ImageLink",
