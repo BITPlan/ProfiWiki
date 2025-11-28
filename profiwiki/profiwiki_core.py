@@ -100,6 +100,8 @@ class ProfiWiki:
         """
         self.args = args
         self.config.fromArgs(args)
+        # ProfiWiki specific configuration entries
+        self.config.memcached = args.memcached
         # use bind mount if we are in family mode
         if self.args.family:
             self.config.bind_mount=True
@@ -212,6 +214,40 @@ class ProfiWiki:
         pdb = ProfiWikiContainer(db)
         return pmw, pdb
 
+    def add_compose_service(self, mwApp: DockerApplication, service_key: str, service_yaml: str):
+        """
+        add a service to the docker compose file
+
+        Args:
+            mwApp(DockerApplication): the mediawiki application
+            service_key(str): the key of the service e.g. memcached
+            service_yaml(str): the yaml definition of the service (must start with indentation)
+        """
+        compose_path = f"{mwApp.dockerPath}/docker-compose.yml"
+        with open(compose_path, "r") as f:
+            content = f.read()
+
+        # Idempotency check to ensure we don't add it twice
+        if f"{service_key}:" not in content:
+            if self.config.verbose:
+                print(f"Adding {service_key} service to {compose_path}")
+            with open(compose_path, "a") as f:
+                f.write(service_yaml)
+
+    def add_memcached(self, mwApp: DockerApplication):
+        """
+        add memcached to the docker compose file
+
+        Args:
+            mwApp(DockerApplication): the mediawiki application
+        """
+        memcached_service = """
+  memcached:
+    image: memcached:alpine
+    restart: always"""
+        self.add_compose_service(mwApp, "memcached", memcached_service)
+
+
     def patch(self, pwc: ProfiWikiContainer):
         """
         apply profi wiki patches to the given ProfiWikiContainer
@@ -226,7 +262,7 @@ class ProfiWiki:
             pwc.log_action(f"patching {ls_file.name}")
             pwc.dc.container.copy_from(ls_path, ls_file.name)
             patch = Patch(file_path=ls_file.name)
-            lines = f"""// modified by profiwiki
+            lines = f"""// modified by profiwiki at {timestamp}
 // use WikiEditor e.g. for MsUpload
 wfLoadExtension( 'WikiEditor' );
 # make this an intranet - comment out if you want this to be a public wiki
@@ -299,6 +335,16 @@ $wgFileExtensions = array_merge($wgFileExtensions, array('doc', 'gcode',
 $wgVerifyMimeType=false;
 # disable upload script checks ...
 $wgDisableUploadScriptChecks = true;
+"""
+            # memcached configuration lines
+            if getattr(self.config, "memcached", False):
+                lines += """# Memcached config
+$wgMainCacheType = CACHE_MEMCACHED;
+$wgParserCacheType = CACHE_MEMCACHED;
+$wgMessageCacheType = CACHE_MEMCACHED;
+$wgSessionCacheType = CACHE_MEMCACHED;
+$wgMemCachedServers = [ 'memcached:11211' ];
+$wgSessionsInObjectCache = true;
 """
             patch.add_text(lines)
             patch.save()

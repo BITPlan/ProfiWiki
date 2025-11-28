@@ -32,15 +32,14 @@ class ProfiWikiCmd(BaseCmd):
         parser.add_argument(
             "--all", help="do all necessary steps for a full setup", action="store_true"
         )
+        parser.add_argument(
+            "--anubis",
+            action="store_true",
+            help="add anubis support [default: %(default)s]",
+        )
         parser.add_argument("--bash", help="bash into container", action="store_true")
         parser.add_argument("--create", action="store_true", help="create the wiki")
         parser.add_argument("--check", action="store_true", help="check the wiki")
-        parser.add_argument("--family", action="store_true", help="support wiki family e.g. with bind mounts")
-        parser.add_argument(
-            "--update",
-            action="store_true",
-            help="start the update script -e.g. to fix SMW key",
-        )
         parser.add_argument("--cron", action="store_true", help="start cron service")
         parser.add_argument(
             "--down",
@@ -48,9 +47,18 @@ class ProfiWikiCmd(BaseCmd):
             help="shutdown the wiki [default: %(default)s]",
         )
         parser.add_argument(
-            "--patch",
+            "--elastica",
             action="store_true",
-            help="apply LocalSettings.php patches [default: %(default)s]",
+            help="add elastica/cirrus search support [default: %(default)s]",
+        )
+        parser.add_argument(
+            "-fa", "--fontawesome", action="store_true", help="install fontawesome"
+        )
+        parser.add_argument(
+            "--family", action="store_true", help="support wiki family e.g. with bind mounts"
+        )
+        parser.add_argument(
+            "-i", "--info", help="show system info", action="store_true"
         )
         parser.add_argument(
             "--list",
@@ -58,16 +66,25 @@ class ProfiWikiCmd(BaseCmd):
             help="list the available profi wikis [default: %(default)s]",
         )
         parser.add_argument(
-            "-fa", "--fontawesome", action="store_true", help="install fontawesome"
+            "--memcached",
+            action="store_true",
+            help="add memcached support [default: %(default)s]",
         )
         parser.add_argument(
-            "-wuc", "--wikiuser_check", action="store_true", help="check wikiuser"
+            "--patch",
+            action="store_true",
+            help="apply LocalSettings.php patches [default: %(default)s]",
         )
         parser.add_argument(
             "-pu", "--plantuml", action="store_true", help="install plantuml"
         )
         parser.add_argument(
-            "-i", "--info", help="show system info", action="store_true"
+            "--update",
+            action="store_true",
+            help="start the update script -e.g. to fix SMW key",
+        )
+        parser.add_argument(
+            "-wuc", "--wikiuser_check", action="store_true", help="check wikiuser"
         )
         return parser
 
