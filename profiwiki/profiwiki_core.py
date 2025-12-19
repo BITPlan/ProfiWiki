@@ -28,7 +28,7 @@ class ProfiWiki:
         self,
         prefix: str = "pw",
         smw_version="5.0.2",
-        mw_version="1.39.15",
+        mw_version="1.39.17",
         port: int = 9079,
     ):
         """
