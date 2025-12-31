@@ -4,6 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ProfiWiki"
+description = "BITPlan's Professional SemanticMediaWiki"
 authors = [
   {name = "Wolfgang Fahl", email = "wf@bitplan.com"}
 
@@ -40,7 +41,7 @@ classifiers=[
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: Apache Software License"
     ]
-dynamic = ["version", "description"]
+dynamic = ["version"]
 [tool.hatch.version]
 path = "profiwiki/__init__.py"
 
@@ -65,4 +66,3 @@ only-include = ["profiwiki"]
 
 [project.scripts]
 profiwiki = "profiwiki.profiwiki_cmd:main"
-
