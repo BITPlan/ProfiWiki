@@ -64,7 +64,7 @@ class ProfiWiki:
             "Page Forms",
             "ParserFunctions",
             "PDFEmbed",
-            "Renameuser",
+            # "Renameuser", removed 2026-07-07 - part of MediaWiki core since 1.40
             "Replace Text",
             #"Semantic Result Formats", Version4
             "SRF5",
