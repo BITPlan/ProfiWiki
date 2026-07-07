@@ -55,7 +55,7 @@ class ProfiWiki:
             # "Graph", removed 2025-09-30
             "Header Tabs",
             "ImageMap",
-            "ImageLink",
+            # "ImageLink", removed 2026-07-07 - no extension.json yet, fatals on MW >= 1.43 - see https://github.com/BITPlan/ImageLink/issues/1
             "MagicNoCache",
             "Maps11",
             "Mermaid",
