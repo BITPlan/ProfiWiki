@@ -15,8 +15,8 @@ from mwdocker.docker import DockerApplication
 from mwdocker.mwcluster import MediaWikiCluster
 from wikibot3rd.wikiuser import WikiUser
 
-from profiwiki.pw_container import ProfiWikiContainer
 from profiwiki.patch import Patch
+from profiwiki.pw_container import ProfiWikiContainer
 
 
 class ProfiWiki:
@@ -66,7 +66,7 @@ class ProfiWiki:
             "PDFEmbed",
             # "Renameuser", removed 2026-07-07 - part of MediaWiki core since 1.40
             "Replace Text",
-            #"Semantic Result Formats", Version4
+            # "Semantic Result Formats", Version4
             "SRF5",
             "Scribunto",
             "SyntaxHighlight",
@@ -104,7 +104,7 @@ class ProfiWiki:
         self.config.memcached = args.memcached
         # use bind mount if we are in family mode
         if self.args.family:
-            self.config.bind_mount=True
+            self.config.bind_mount = True
         if len(self.config.versions) == 1:
             self.config.version = self.config.versions[0]
 
@@ -130,16 +130,16 @@ class ProfiWiki:
             mwApp.createWikiUser(store=True)
         if args.all:
             image_name = f"profiwiki:{mwApp.config.shortVersion}"
-            image=ProfiWikiContainer.get_image(image_name)
+            image = ProfiWikiContainer.get_image(image_name)
             if image:
                 # we could use the image here to speed up things
                 pass
-            self.create(mwApp,self.config.forceRebuild)
+            self.create(mwApp, self.config.forceRebuild)
             pmw, _pdb = self.getProfiWikiContainers(mwApp)
             pmw.install_fontawesome()
             pmw.install_plantuml()
             pmw.commit(tag=image_name)
-            mwApp.execute("/scripts/setup-mediawiki.sh","--all")
+            mwApp.execute("/scripts/setup-mediawiki.sh", "--all")
             self.patch(pmw)
         if args.wikiuser_check:
             self.check_wikiuser(mwApp)
@@ -214,7 +214,9 @@ class ProfiWiki:
         pdb = ProfiWikiContainer(db)
         return pmw, pdb
 
-    def add_compose_service(self, mwApp: DockerApplication, service_key: str, service_yaml: str):
+    def add_compose_service(
+        self, mwApp: DockerApplication, service_key: str, service_yaml: str
+    ):
         """
         add a service to the docker compose file
 
@@ -247,7 +249,6 @@ class ProfiWiki:
     restart: always"""
         self.add_compose_service(mwApp, "memcached", memcached_service)
 
-
     def patch(self, pwc: ProfiWikiContainer):
         """
         apply profi wiki patches to the given ProfiWikiContainer
@@ -256,6 +257,11 @@ class ProfiWiki:
             raise ("no container to apply patch")
         ls_path = "/var/www/html/LocalSettings.php"
         timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%d")
+        # $wgAllowImageTag is deprecated since 1.35 and a hard
+        # config-validation error for update.php since MediaWiki 1.43
+        allow_image_tag = ""
+        if self.config.shortVersion < "143":
+            allow_image_tag = "// allow images\n$wgAllowImageTag=true;\n"
         with tempfile.NamedTemporaryFile(
             mode="w", prefix="LocalSettings_", suffix=".php"
         ) as ls_file:
@@ -277,9 +283,7 @@ $smwgNamespacesWithSemanticLinks[NS_TEMPLATE] = true;
 $wgPFEnableStringFunctions=true;
 // allow raw HTML
 $wgRawHtml = true;
-// allow images
-$wgAllowImageTag=true;
-// InstantCommons allows wiki to use images from https://commons.wikimedia.org
+{allow_image_tag}// InstantCommons allows wiki to use images from https://commons.wikimedia.org
 $wgUseInstantCommons = true;
 // avoid showing (expected) deprecation warnings
 error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
@@ -356,7 +360,7 @@ $wgSessionsInObjectCache = true;
         """
         mwApp.check()
 
-    def create(self, mwApp,forceRebuild: bool = False):
+    def create(self, mwApp, forceRebuild: bool = False):
         """
         create a profiwiki mediawiki
         """
