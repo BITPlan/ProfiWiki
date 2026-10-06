@@ -28,7 +28,7 @@ class ProfiWiki:
         self,
         prefix: str = "pw",
         smw_version="5.0.2",
-        mw_version="1.43.9",
+        mw_version="1.43.11",
         port: int = 9079,
     ):
         """
@@ -57,7 +57,7 @@ class ProfiWiki:
             "ImageMap",
             # "ImageLink", removed 2026-07-07 - no extension.json yet, fatals on MW >= 1.43 - see https://github.com/BITPlan/ImageLink/issues/1
             "MagicNoCache",
-            "Maps11",
+            "Maps12",
             "Mermaid",
             "MsUpload",
             "Nuke",
