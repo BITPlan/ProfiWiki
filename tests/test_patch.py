@@ -6,8 +6,9 @@ Created on 2023-04-09
 
 import tempfile
 
-from profiwiki.patch import Patch
 from basemkit.basetest import Basetest
+
+from profiwiki.patch import Patch
 
 
 class TestPatch(Basetest):

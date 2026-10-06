@@ -10,6 +10,7 @@ from mwdocker.docker import DockerContainer
 from python_on_whales import DockerException
 from python_on_whales import docker as pow_docker
 
+
 class ProfiWikiContainer:
     """
     a profiwiki docker container wrapper
@@ -23,10 +24,10 @@ class ProfiWikiContainer:
         self.dc = dc
 
     @staticmethod
-    def get_image(image_name:str):
-        image=None
+    def get_image(image_name: str):
+        image = None
         try:
-            image=pow_docker.image.inspect(image_name)
+            image = pow_docker.image.inspect(image_name)
         except Exception as ex:
             # FIXME filter exceptions that need to be handled
             if "-something we would like to handle -" in str(ex):
@@ -42,7 +43,7 @@ class ProfiWikiContainer:
             tag(str): the target image tag e.g. 'ProfiWiki-1.39.13'
         """
         self.log_action(f"committing to image {tag}")
-        pow_docker.commit(container=self.dc.container,tag=tag)
+        pow_docker.commit(container=self.dc.container, tag=tag)
 
     def log_action(self, action: str):
         """
@@ -68,7 +69,6 @@ class ProfiWikiContainer:
             self.dc.container.kill()
             self.dc.container.remove(volumes=volumes)
 
-
     def run_script_in_container(self, script_to_execute: str, sudo: bool = False):
         """
         Make the script executable and run it in the container.
@@ -83,7 +83,6 @@ class ProfiWikiContainer:
         cmd += ["bash", script_to_execute]
         self.dc.execute(*cmd)
 
-
     def install_and_run_script_from_file(self, script_name: str, sudo: bool = False):
         """
         Copy a local shell script into the container and execute it.
@@ -93,27 +92,27 @@ class ProfiWikiContainer:
             sudo: whether to use sudo inside the container
         """
         local_script_path = self.get_local_script(script_name)
-        script_to_execute=f"/scripts/{script_name}"
+        script_to_execute = f"/scripts/{script_name}"
         pow_docker.copy(local_script_path, (self.dc.container.name, script_to_execute))
         self.run_script_in_container(script_to_execute, sudo=sudo)
 
-    def get_local_script(self,name:str)->str:
-        script_path=os.path.join(os.path.dirname(__file__), "resources", name)
+    def get_local_script(self, name: str) -> str:
+        script_path = os.path.join(os.path.dirname(__file__), "resources", name)
         return script_path
 
     def install_plantuml(self):
         """
         install plantuml to this container
         """
-        self.install_and_run_script_from_file("install_plantuml.sh",sudo=True)
+        self.install_and_run_script_from_file("install_plantuml.sh", sudo=True)
         pass
 
     def install_fontawesome(self):
         """
         install fontawesome to this container
         """
-        script_name="install_fontawesome.sh"
-        self.install_and_run_script_from_file(script_name,sudo=True)
+        script_name = "install_fontawesome.sh"
+        self.install_and_run_script_from_file(script_name, sudo=True)
         try:
             self.dc.container.execute(["service", "apache2", "restart"])
         except DockerException as e:

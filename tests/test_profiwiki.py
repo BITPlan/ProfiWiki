@@ -3,10 +3,12 @@ Created on 2023-04-01
 
 @author: wf
 """
+
 import json
 import os
 
 from basemkit.basetest import Basetest
+
 from profiwiki.profiwiki_cmd import ProfiWikiCmd
 from profiwiki.profiwiki_core import ProfiWiki
 from profiwiki.version import Version
@@ -34,7 +36,7 @@ class TestProfiWiki(Basetest):
             "--sql_base_port",
             "11001",
             "--apache",
-            "test.bitplan.com"
+            "test.bitplan.com",
         ]
 
     def testConfig(self):
@@ -51,9 +53,11 @@ class TestProfiWiki(Basetest):
         """
         get a profiwiki for the given command line arguments
         """
-        pwcmd=ProfiWikiCmd(Version)
+        pwcmd = ProfiWikiCmd(Version)
         pw = pwcmd.pw
-        parser=ProfiWikiCmd.getArgParser(pwcmd,description=Version.license, version_msg="ProfiWiki for test")
+        parser = ProfiWikiCmd.getArgParser(
+            pwcmd, description=Version.license, version_msg="ProfiWiki for test"
+        )
         pw.args = parser.parse_args(argv)
         pw.config.fromArgs(pw.args)
         return pw
@@ -103,7 +107,7 @@ class TestProfiWiki(Basetest):
         mwApp = self.getMwApp()
         apache_config = self.pw.apache_config(mwApp)
         debug = self.debug
-        #debug = True
+        # debug = True
         if debug:
             print(apache_config)
         self.assertTrue("ServerName test.bitplan.com" in apache_config)

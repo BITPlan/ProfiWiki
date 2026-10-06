@@ -9,6 +9,7 @@ import sys
 from typing import List
 
 from basemkit.base_cmd import BaseCmd
+
 from profiwiki.profiwiki_core import ProfiWiki
 from profiwiki.version import Version
 
@@ -55,7 +56,9 @@ class ProfiWikiCmd(BaseCmd):
             "-fa", "--fontawesome", action="store_true", help="install fontawesome"
         )
         parser.add_argument(
-            "--family", action="store_true", help="support wiki family e.g. with bind mounts"
+            "--family",
+            action="store_true",
+            help="support wiki family e.g. with bind mounts",
         )
         parser.add_argument(
             "-i", "--info", help="show system info", action="store_true"
@@ -112,4 +115,3 @@ def main(argv: List[str] = None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
-
